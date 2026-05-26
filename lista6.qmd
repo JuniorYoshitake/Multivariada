@@ -436,6 +436,8 @@ fa.diagram(
 
 ```{r}
 
+#|eval: false
+
 dados <- read.csv("Q4_4.csv") %>% select(-PUF_ID)
 
 dados_ord <- dados %>%
@@ -467,3 +469,36 @@ print(fit)
 ```
 
 ## 4.8 Artes e Barroso
+
+Devido a não encontrar esses dados para download a análise não foi possível
+
+## Morettin e Singer, 2023
+
+\textbf{Num estudo planejado para avaliar o nível de poluição atmosférica por meio de medidas de elementos químicos depositados em cascas de árvores, obtiveram-se observações da concentração Al, Ba, Cu, Fe, Zn, P, Cl, Sr e Ca entre outros
+elementos em 193 unidades da espécie Tipuana tipu na cidade de São Paulo. Esses
+dados estão disponíveis no arquivo arvores.xls
+
+Realize uma análise fatorial com o objetivo de obter um conjunto de fatores que permitam identificar características comuns a essas variáveis.}
+
+```{r}
+
+library(readxl)
+library(tidyr)
+
+dados <- read_xls(path = "arvores.xls") %>% select(-especie, -tipovia) %>% mutate(across(everything(), ~ replace_na(.x, 0)))
+
+mcor <- cor(dados)
+
+#PC, m=1 (Modelo Base)
+af1arvores <- principal(mcor, nfactors = 1, rotate = "none")
+
+res1 <- round(mcor - (af1arvores$loadings %*% t(af1arvores$loadings) + diag(af1arvores$uniquenesses)), 3)
+
+#PC, m=5 
+af5arvores <- principal(mcor, nfactors = 5, rotate = "none")
+res5 <- round(mcor - (af5arvores$loadings %*% t(af5arvores$loadings) + diag(af5arvores$uniquenesses)), 3)
+
+print(af5arvores, digits = 3)
+print(res5)
+```
+
