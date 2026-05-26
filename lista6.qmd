@@ -170,3 +170,300 @@ Resolução da Lista 6 da disciplina Análise Multivariada.
 \newpage
 
 \singlespacing
+
+# Teoria
+
+$$
+h_i^2
+$$
+
+é comunalidade, calculada pela soma dos quadrados dos valores de das cargas fatoriais ($\ell_{ij}$) 
+
+$$
+\psi_i
+$$
+
+representa o erro ou a parte daquela variável que é única e não tem nada a ver com os outros fatores, é o que a comunalidade não explica, variância específica.
+
+$$
+Var(X_i) = h_i^2 + \psi_i
+$$
+
+
+# Questões
+
+## 4.1 Artes e Barroso
+
+Clientes de uma rede de lojas do setor de vetuário avaliaram a qualidade dos pontos de venda (dados fictícios). Foram atribuídas notas (de 0 a 10) aos seguintes atributos (quanto maior a nota, maior é a percepção de que o ponto de venda possui atributo)
+
+- X1: Cordialidade dos vendedores;
+- X2: Limpeza da Loja;
+- X3: Falta de agilidade no atendimento;
+- X4: Demora na concessão de crédito;
+- X5: Vendedores bem informados sobre os produtos da loja.
+
+Para entender o padrão de respostas observado na amostra, aplicou-se uma análise fatorial à matriz de correlação dessas variáveis. A tabela 4.18 apresenta as cargas fatoriais obtidas após uma rotação varimax.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| paged-print: false
+#| tbl-cap: "Tabela 4.18 do livro Artes e Barroso"
+
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(psych)
+
+dados <- data.frame(
+  F1 = c(-0.79, -0.07,  0.90,  0.92, -0.64),
+  F2 = c( 0.43,  0.96, -0.18,  0.22,  0.40)
+)
+
+rownames(dados) <- paste0("X", 1:5)
+
+dados <- dados %>% mutate("h2" = F1^2 + F2^2,
+                          "ei" = 1 - h2)
+
+total <- data.frame(
+  F1 = sum(dados$F1^2),
+  F2 = sum(dados$F2^2),
+  h2 = NA,
+  ei = NA)
+
+sumF1 <- sum(dados$F1^2)
+sumF2 <- sum(dados$F2^2)
+
+perc_exp_F1 <- sumF1/5
+perc_exp_F2 <- sumF2/5
+
+total_exp <- perc_exp_F1 + perc_exp_F2
+
+dados_final <- bind_rows(dados, Total = total)
+
+rownames(dados_final)[6] <- "SS"
+
+dados_final$h2[is.na(dados_final$h2)] <- ""
+dados_final$ei[is.na(dados_final$ei)] <- ""
+
+kable(
+  dados_final,
+  format = "latex",
+  booktabs = TRUE,
+  align = "c",
+  col.names = c("F1", "F2", "$h^2$", "$\\psi$"),
+  escape = FALSE,
+) %>%
+  kable_styling(latex_options = c("hold_position", "striped"))
+
+```
+
+\textbf{a) Determine e interprete as comunalidades e as porcentagens de explicação dos fatores. Critique a escolha do número de fatores}
+
+F1 é definido positivamente por X3 e X4, e negativamente por X1 e X5. Portanto, podemos apontar F1 como Ineficiência do atendimento;
+
+F2 é definido positivamente, com uma carga altíssima, por X2, Logo, podemos apontar F2 como Ambiente da Loja.
+
+A comunalidade de X2 é a maior, indicando que a percepção de limpeza é quase totalmente explicada pelos constructos do modelo, sendo um indicador confiável para o "Ambiente da Loja". Já a de X5, que é a menor, indica que os constructos explicam apenas 56.96% da variável, o restante é dado pela variância específica, não capturada pelos constructos.
+
+A porcentagem de explicação é de 0.539 para F1 e 0.269 para F2, totalizando 0.808. o que é satisfatório, pois retém a maior parte da informação original com apenas dois índices. Logo, $m=2$ (2 fatores) é suficiente, uma vez que se busca 70-80% em análises exploratórias.
+
+\textbf{b) Interprete os fatores rotacionados}
+
+O problema já diz que a tabela 4.18 é proveniente da rotação de varimax. Desta maneira, é possível observar com mais clareza quais variáveis de fato dominam um constructo. Por exemplo: X2 (limpeza) possui uma carga de 0.96 no Fator 2, e quase zero no Fator 1, esse comportamento se deve a rotação, esse é um fator rotacionado, onde toda a explicação da limpeza foi "puxada" para uma coluna.
+
+\textbf{c) Construa um diagrama de caminho que descreva a análise realizada. Descreva as respectivas equações.}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| paged-print: false
+#| fig-cap: "Diagrama Fatorial 4.1"
+
+R <- diag(5)
+
+# cria objeto fa válido
+modelo <- fa(R, nfactors = 2, rotate = "none", fm = "minres")
+
+# substitui pelas suas cargas
+modelo$loadings[,] <- as.matrix(dados[, c("F1", "F2")])
+
+# comunalidades
+modelo$communality <- dados$h2
+
+# unicidades
+modelo$uniquenesses <- dados$ei
+
+rownames(modelo$loadings) <- rownames(dados)
+
+# diagrama
+fa.diagram(
+  modelo,
+  simple = FALSE,
+  digits = 2,
+  cut = 0,
+  main = "Diagrama Fatorial"
+)
+
+```
+
+As equações são:
+
+$X_1 - \mu_1 =  - 0.790F_1 + 0.430F_2 + \varepsilon_1$
+
+$X_2 - \mu_2 =  - 0.070F_1 + 0.926F_2 + \varepsilon_2$
+
+$X_3 - \mu_3 =  0.900F_1 + 0.842F_2 + \varepsilon_3$
+
+$X_4 - \mu_4 =  0.920F_1 + 0.894F_2 + \varepsilon_4$
+
+$X_5 - \mu_5 =  - 0.640F_1 + 0.569F_2 + \varepsilon_5$
+
+\textbf{d) Um analista reservou os dois fatores e determinou seus escores fatoriais. O diagrama de dispersão apresentado na Figura 4.7 descreve o comportamento desses escores. Nesse diagrama foi destacado um ponto (vide a flecha) referente a um determinado consumidor. Como você interpretaria a percepção desse consumidor em relacão aos demais? O analista conclui que se tratava de um valor aberrante multidimensional. Essa conclusão faz sentido?}
+
+Dada posição desse consumidor, que é próximo de 0 no escore fatorial do fator 1 e perto de -4 no escore fatorial do fator 2, é possível dizer que a percepção dele acerca da ineficiência do do atendimento é mediana, ou que a agilidade e cordialidade estão "na média". Porém, por outro lado, esse indivíduo tem uma percepção extremamente negativa do ambiente da loja (4 desvioes padrÕes abaixo da média), o que o torna inconsistente em relação à outras observações.
+
+## 4.3 Artes e Barroso
+
+\textbf{Retome o enunciado do Exercício 2.5. Aplique uma análise fatorial pelo método das componentes principais utilizando a matriz de correlações policóricas. O conjunto de fatores deve explicar pelo menos 70\% da variabilidade total dos dados. Faça uma análise completa dos resultados.}
+
+
+\textbf{ A tabela 2.10 traz os dados da aba Medias de Pizza.xlsx, com informações sobre os valores médios e características físico-químicas avaliadas em amostras de dez marcas de pizzas. A lista das características está na tabela 2.9.}
+
+```{r}
+#| echo: false
+#| tbl-cap: "Tabela 2.10 do livro Artes e Barroso"
+pizza <- read.csv("Pizza.csv") %>% select(-brand, -id)
+
+pizza_ord <- pizza %>%
+  mutate(across(
+    everything(),
+    \(x) {
+      cortes <- quantile(
+        x,
+        probs = seq(0, 1, length.out = 12),
+        na.rm = TRUE
+      )
+      cortes <- unique(cortes)
+      
+      cut(
+        x,
+        breaks = cortes,
+        include.lowest = TRUE,
+        labels = FALSE
+      ) - 1
+    }
+  ))
+
+matriz_poly <- polychoric(pizza_ord, max.cat = 11)$rho
+
+fit <- principal(matriz_poly, nfactors = 2, rotate = "varimax")
+
+# cargas fatoriais
+cargas <- as.data.frame(unclass(fit$loadings))
+
+# comunalidades
+cargas$h2 <- fit$communality
+
+# unicidades
+cargas$ei <- fit$uniquenesses
+
+# soma dos quadrados das cargas
+ss <- data.frame(
+  RC1 = sum(cargas$RC1^2),
+  RC2 = sum(cargas$RC2^2),
+  h2 = NA,
+  ei = NA
+)
+
+cargas <- cargas %>% mutate(h2 = round(h2, 4),
+                            ei = round(ei, 4))
+
+# adiciona linha final
+tabela_final <- bind_rows(cargas, SS = ss)
+
+tabela_final$h2[is.na(tabela_final$h2)] <- ""
+tabela_final$ei[is.na(tabela_final$ei)] <- ""
+
+rownames(tabela_final)[8] <- "SS"
+
+# tabela latex
+kable(
+  tabela_final,
+  format = "latex",
+  booktabs = TRUE,
+  align = "c",
+  escape = FALSE,
+  digits = 2,
+  col.names = c("F1", "F2", "$h^2$", "$\\psi$")
+) %>%
+  kable_styling(
+    latex_options = c("hold_position", "striped")
+  )
+
+var_f1 <- 3.83/7
+var_f2 <- 2.21/7
+
+var_exp <- var_f1 + var_f2
+
+```
+
+O constructo F1 é positivamente dominado por ash, sodium, prot e fat, e negativamente por carb. Portanto, podemos apontar F1 como perfil de ingredientes.
+
+O constructo F2 é positivamente delimitado por cal, e negativamente por mois. Logo, podemos apontar F2 como Calorias X umidade.
+
+A maior comunalidade pertence a Ash, indicando que a percepção acerca do perfil dos ingredientes é quase totalmente explicada pelos constructos do modelo, sendo um indicador confiável. A menor comunalidade pertence ao sódio, ou seja, fatores não capturados pelo modelo a influenciam.
+
+```{r}
+#| echo: false
+#| fig-cap: "Diagrama Fatorial 4.3"
+#| 
+
+fa.diagram(
+  fit,
+  simple = FALSE,
+  digits = 2,
+  cut = 0,
+  main = "Diagrama Fatorial"
+)
+```
+
+## 4.4 Artes e Barroso
+
+\textbf{Retome o enunciado do Exercício 3.4. Aplique uma análise fatorial pelo método das componentes principais utilizando a matriz de correlações policóricas. O conjunto de fatores deve explicar pelo menos 70\% da variabilidade total dos dados. Faça uma análise completa dos resultados.}
+
+```{r}
+
+dados <- read.csv("Q4_4.csv") %>% select(-PUF_ID)
+
+dados_ord <- dados %>%
+  mutate(across(
+    everything(),
+    \(x) {
+      cortes <- quantile(
+        x,
+        probs = seq(0, 1, length.out = 11),
+        na.rm = TRUE
+      )
+      cortes <- unique(cortes)
+      
+      cut(
+        x,
+        breaks = cortes,
+        include.lowest = TRUE,
+        labels = FALSE
+      ) - 1
+    }
+  ))
+
+matriz_poly <- polychoric(dados_ord, max.cat = 11)$rho
+
+fit <- principal(matriz_poly, nfactors = 30, rotate = "varimax")
+
+print(fit)
+
+```
+
+## 4.8 Artes e Barroso
