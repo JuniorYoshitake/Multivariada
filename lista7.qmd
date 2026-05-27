@@ -196,8 +196,11 @@ Original      & 3,39 & 3,99 & 3,95 & 2,33 \\
 \end{table}
 
 \textbf{a) Realize um EM métrico utilizando os dados da Tabela 5.9
+
 b) Avalie a qualidade da solução em duas dimensões
+
 c) Interprete os eixos de uma solução em duas dimensões
+
 d) Faça uma análise completa dos resultados, identifique grupos de mercas percebidas como semelhantes e caracterize os grupos. Sugestão: Utilize o biplot.}
 
 ```{r}
@@ -227,7 +230,7 @@ cerveja <- data.frame(
 
 Seguindo o passo a passo:
 
-1 - Obtenção das matriz de distâncias euclidianas
+1 - Obtenção da matriz de distâncias euclidianas
 
 ```{r}
 #| tbl-cap: "Matriz de distâncias euclidianas"
@@ -240,29 +243,104 @@ DistCerveja <- dist(cbind(cerveja$Propaganda,
 
 knitr::kable(round(as.matrix(DistCerveja), 4))
 
-DC <- as.matrix(DistCerveja)
-
-rownames(DC) <- cerveja$Cod
-colnames(DC) <- cerveja$Cod
-
 ```
 
 2 - Escalonamento Multimensional métrico
 
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Gráfico EM métrico"
+DC <- as.matrix(DistCerveja)
+
+rownames(DC) <- cerveja$Marca
+colnames(DC) <- cerveja$Marca
 
 EMD_cerveja <- cmdscale(DC, eig=TRUE, k=2)
 
 x <- EMD_cerveja$points[,1]
 y <- EMD_cerveja$points[,2]
 
-plot(x,y, type="n",
+plot(x,y, type = "n",
      xlab="Dimensão 1",
      ylab="Dimensão 2",
-     main="Painel A")
+     main="Painel")
 text(x,y, rownames(DC), cex=1)
 abline(h=0, lty=2)
 abline(v=0, lty=2)
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Biplot EM"
+#| label: fig-biplot
+library(MVar.pt)
+
+cervejaMat <- as.matrix(cbind(cerveja$Propaganda, cerveja$Qualidade, cerveja$Sabor, cerveja$Preco))
+
+rownames(cervejaMat) <- cerveja$Marca
+
+colnames(cervejaMat) <- c("Propaganda", "Qualidade", "Sabor", "Preco")
+
+Dados <- as.data.frame(cervejaMat)
+
+A <- Biplot(Dados, linlab=cerveja$Marca, size=0, grid=FALSE)
 
 ```
 
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Painel B"
+
+x <- A$coorI[,1]
+y <- A$coorI[,2]
+plot(x,y, type = "n",
+     xlab = "Coordenada 1",
+     ylab = "Coordenada 2",
+     main = "Painel B",
+     xlim = c(-1,0.5),
+     ylim = c(-0.4,0.4))
+text(x, y, rownames(DC), cex=1)
+```
+
+Respondendo as questões
+
+\textbf{b) Avalie a qualidade da solução em duas dimensões}
+
+Para calcular a qualidade da solução, devemos pegar a soma dos dois primeiros autovalores e dividir pela soma de todos os autovalores, pois os autovalores representam a variância associada às dimensões do EMD.
+
+```{r}
+eig <- EMD_cerveja$eig
+qualidade <- sum(eig[1:2]) / sum(eig[eig > 0])
+qualidade
+
+```
+qualidade próxima de 100%, ótima.
+
+\textbf{c) Interprete os eixos de uma solução em duas dimensões}
+
+```{r}
+
+A$coorV
+
+```
+A dimensão 1 é tomada por aspectos positivos, como qualidade e sabor, com valores baixos em propaganda e preço. Logo, denotam marcas com percepções mais positivas
+
+A dimensão é dominada pela propaganda, com um pouco de preço, representam marcas que possuem marketing mais forte
+
+Ademais, é possível concluir que marcas com qualidade alta geralmente são percebidas com alto nível de sabor também.
+
+\textbf{d) Faça uma análise completa dos resultados, identifique grupos de mercas percebidas como semelhantes e caracterize os grupos. Sugestão: Utilize o biplot.}
+
+Com base na @fig-biplot, é possível notar os grupos:
+
+1 - Heineken como a mais cara e com mais propaganda, mas qualidade e sabor similar a Stella Artoi e Original
+
+2 - Budweiser e Brahma são medianas em tudo, sabor, propaganda, preço, qualidade
+
+3 - Antartica e Skol são as piores, sendo a Skol com mais propaganda e um pouco mais de qualidade e sabor, e acima de tudo, a mais cara. Antartica ficou atrás de todos os aspectos.
