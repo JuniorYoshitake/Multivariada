@@ -195,13 +195,17 @@ Original      & 3,39 & 3,99 & 3,95 & 2,33 \\
 \end{tabular}
 \end{table}
 
-\textbf{a) Realize um EM métrico utilizando os dados da Tabela 5.9
+\textbf{a) Realize um EM métrico utilizando os dados da Tabela 5.9}
 
-b) Avalie a qualidade da solução em duas dimensões
+\textbf{b) Avalie a qualidade da solução em duas dimensões}
 
-c) Interprete os eixos de uma solução em duas dimensões
+\textbf{c) Interprete os eixos de uma solução em duas dimensões}
 
-d) Faça uma análise completa dos resultados, identifique grupos de mercas percebidas como semelhantes e caracterize os grupos. Sugestão: Utilize o biplot.}
+\textbf{d) Faça uma análise completa dos resultados, identifique grupos de mercas percebidas como semelhantes e caracterize os grupos. Sugestão: Utilize o biplot.}
+
+Respondendo as questões
+
+\textbf{a) Realize um EM métrico utilizando os dados da Tabela 5.9}
 
 ```{r}
 #| message: false
@@ -321,7 +325,6 @@ plot(x,y, type = "n",
 text(x, y, rownames(DC), cex=1)
 ```
 
-Respondendo as questões
 
 \textbf{b) Avalie a qualidade da solução em duas dimensões}
 

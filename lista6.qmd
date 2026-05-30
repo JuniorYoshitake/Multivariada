@@ -1556,9 +1556,11 @@ dados estão disponíveis no arquivo arvores.xls}
 
 \textbf{Realize uma análise fatorial com o objetivo de obter um conjunto de fatores que permitam identificar características comuns a essas variáveis.}
 
+Para realizar uma análise fatorial, foi necessário alterar os NAs do banco de dados para 0. Ademais, a matriz de correlação de Pearson foi utilizada.
+
 ```{r}
 #| echo: false
-
+#| tbl-cap: "Cargas fatoriais (rotação varimax), comunalidades e variância específica dos dados Arvores"
 library(readxl)
 library(tidyr)
 
@@ -1566,7 +1568,7 @@ dados <- read_xls(path = "arvores.xls") %>% select(-especie, -tipovia) %>% mutat
 
 mcor <- cor(dados)
 
-af6arvores <- principal(mcor, nfactors = 6, rotate = "none")
+af6arvores <- principal(mcor, nfactors = 6, rotate = "varimax")
 res6 <- round(mcor - (af6arvores$loadings %*% t(af6arvores$loadings) + diag(af6arvores$uniquenesses)), 3)
 
 fit <- af6arvores
@@ -1581,12 +1583,12 @@ cargas$h2 <- fit$communality
 cargas$ei <- fit$uniquenesses
 
 ss <- data.frame(
-  PC1 = sum(cargas$PC1^2),
-  PC2 = sum(cargas$PC2^2),
-  PC3 = sum(cargas$PC3^2),
-  PC4 = sum(cargas$PC4^2),
-  PC5 = sum(cargas$PC5^2),
-  PC6 = sum(cargas$PC6^2),
+  RC1 = sum(cargas$RC1^2),
+  RC2 = sum(cargas$RC2^2),
+  RC3 = sum(cargas$RC3^2),
+  RC4 = sum(cargas$RC4^2),
+  RC5 = sum(cargas$RC5^2),
+  RC6 = sum(cargas$RC6^2),
   h2 = NA,
   ei = NA
 )
@@ -1618,12 +1620,12 @@ rownames(tabela_final) <- gsub(
 # variância explicada
 p <- nrow(cargas)
 
-var_f1 <- ss$PC1 / p
-var_f2 <- ss$PC2 / p
-var_f3 <- ss$PC3 / p
-var_f4 <- ss$PC4 / p
-var_f5 <- ss$PC5 / p
-var_f6 <- ss$PC6 / p
+var_f1 <- ss$RC1 / p
+var_f2 <- ss$RC2 / p
+var_f3 <- ss$RC3 / p
+var_f4 <- ss$RC4 / p
+var_f5 <- ss$RC5 / p
+var_f6 <- ss$RC6 / p
 
 var_total <- var_f1 + var_f2 + var_f3 + var_f4 + var_f5 + var_f6
 
@@ -1643,5 +1645,93 @@ kable(
 
 ```
 
+O critério de escolha para os $m$ fatores foi a porcentagem da variância explicada, que atingiu 78.35% apenas com $m=6$
+
+O Fator 1 (F1) possui cargas fatoriais relevantes positivas para Na (0,91), P (0,82), Sr (0,78) e K (0,68), que são:
+
+- Na: sódio, elemento frequentemente associado à deposição atmosférica de sais e partículas;
+- P: fósforo, nutriente essencial para o desenvolvimento vegetal;
+- Sr: estrôncio, elemento frequentemente encontrado em partículas minerais e materiais do solo;
+- K: potássio, macronutriente importante para as plantas.
+
+Logo, pode ser interpretado como "Deposição de nutrientes e sais minerais".
+
+O Fator 2 (F2) possui cargas fatoriais relevantes positivas para Al (0,85), Ba (0,78), Fe (0,73) e Rb (0,68), que são:
+
+- Al: alumínio, constituinte abundante de minerais presentes no solo;
+- Ba: bário, elemento associado a materiais geológicos e particulados minerais;
+- Fe: ferro, componente comum de minerais do solo;
+- Rb: rubídio, elemento frequentemente encontrado em rochas e minerais.
+
+Logo, pode ser interpretado como "Ressuspensão de poeira e material particulado de origem mineral".
+
+O Fator 3 (F3) possui cargas fatoriais relevantes positivas para Cu (0,87) e Zn (0,81), que são:
+
+- Cu: cobre, elemento associado ao desgaste de freios e componentes metálicos de veículos;
+- Zn: zinco, elemento associado ao desgaste de pneus e peças metálicas.
+
+Logo, pode ser interpretado como "Poluição associada ao tráfego urbano".
+
+O Fator 4 (F4) possui cargas fatoriais relevantes para Ca (-0,90), K (0,51) e Sr (-0,44), que são:
+
+- Ca: cálcio, elemento abundante em cimento, concreto e materiais calcários;
+- K: potássio, nutriente vegetal presente em partículas atmosféricas e poeira;
+- Sr: estrôncio, frequentemente associado a minerais e materiais calcários.
+
+Logo, pode ser interpretado como "Partículas de materiais de construção e fontes calcárias".
+
+O Fator 5 (F5) possui cargas fatoriais relevantes positivas para Mg (0,93) e Cl (0,57), que são:
+
+- Mg: magnésio, elemento presente em minerais e aerossóis atmosféricos;
+- Cl: cloro, elemento frequentemente associado à deposição de sais.
+
+Logo, pode ser interpretado como "Deposição atmosférica de sais minerais".
+
+O Fator 6 (F6) possui cargas fatoriais relevantes positivas para S (0,87) e Mn (0,45), que são:
+
+- S: enxofre, elemento associado a emissões decorrentes da combustão de combustíveis fósseis e processos industriais;
+- Mn: manganês, elemento presente em emissões industriais e material particulado atmosférico.
+
+Logo, pode ser interpretado como "Poluição atmosférica associada à combustão".
+
+Por fim, é possível observar que as comunalidades são altas (maiores que 0.5), mas não tão próximas de 1. Logo, preliminarmente o modelo possui um ajuste razoável-bom. Outra maneira de verificar é comparar a matriz de covariâncias amostrais observada com a estimativa sob modelo:
+
+\begin{equation}
+\hat{\Sigma} = \hat{\Phi}\hat{\Phi}^{\top} + \hat{\Psi}.
+\label{eq:modelo_fatorial}
+\end{equation}
+
+```{r}
+#| echo: false
+#| tbl-cap: "Matriz de resíduos entre as correlações observadas e reproduzidas pelo modelo fatorial 1 de 2 - Arvores"
+
+kable(
+  round(res6[, 1:7], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("HOLD_position")
+  )
+
+```
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Matriz de resíduos entre as correlações observadas e reproduzidas pelo modelo fatorial 2 de 2 - Arvores"
+
+kable(
+  round(res6[, 8:15], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("HOLD_position")
+  )
+
+```
+
+Por meio da matriz de resíduos, observa-se que praticamente todos os resíduos apresentam magnitude reduzida e próxima de zero, sendo inferiores a 0,10 em valor absoluto, com exceção dos pares Cu e Zn, Al e Rb, Ba e Al, cujos resídus são iguais a −0.162, -0.112 e -0.149. Esse resultado indica que a matriz de correlações reproduzida pelo modelo é bastante semelhante à matriz observada. Portanto, a solução fatorial apresenta um bom ajuste, não havendo evidências de discrepâncias relevantes entre os dados observados e aqueles reproduzidos pelos fatores extraídos.
 
 # Referências
