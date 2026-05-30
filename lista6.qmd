@@ -119,6 +119,8 @@ format:
         \titlespacing*{\section}{0cm}{0cm}{0.5cm}
         \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
         \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\paragraph}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subparagraph}{0cm}{0.5cm}{0.5cm}
 
 ---
 
@@ -171,24 +173,13 @@ Resolução da Lista 6 da disciplina Análise Multivariada.
 
 \singlespacing
 
-# Teoria
+A resolução das questões terá o seguinte modelo:
 
-$$
-h_i^2
-$$
+- Perguntas
+- Respostas com Tabelas e Gráficos
+- Códigos
 
-é comunalidade, calculada pela soma dos quadrados dos valores de das cargas fatoriais ($\ell_{ij}$) 
-
-$$
-\psi_i
-$$
-
-representa o erro ou a parte daquela variável que é única e não tem nada a ver com os outros fatores, é o que a comunalidade não explica, variância específica.
-
-$$
-Var(X_i) = h_i^2 + \psi_i
-$$
-
+\newpage
 
 # Questões
 
@@ -261,17 +252,17 @@ kable(
 
 \textbf{a) Determine e interprete as comunalidades e as porcentagens de explicação dos fatores. Critique a escolha do número de fatores}
 
-F1 é definido positivamente por X3 e X4, e negativamente por X1 e X5. Portanto, podemos apontar F1 como Ineficiência do atendimento;
-
-F2 é definido positivamente, com uma carga altíssima, por X2, Logo, podemos apontar F2 como Ambiente da Loja.
-
 A comunalidade de X2 é a maior, indicando que a percepção de limpeza é quase totalmente explicada pelos constructos do modelo, sendo um indicador confiável para o "Ambiente da Loja". Já a de X5, que é a menor, indica que os constructos explicam apenas 56.96% da variável, o restante é dado pela variância específica, não capturada pelos constructos.
 
-A porcentagem de explicação é de 0.539 para F1 e 0.269 para F2, totalizando 0.808. o que é satisfatório, pois retém a maior parte da informação original com apenas dois índices. Logo, $m=2$ (2 fatores) é suficiente, uma vez que se busca 70-80% em análises exploratórias.
+A proporção da variância explicada pelos fatores é de 53,9% para o Fator 1 e 26,9% para o Fator 2, totalizando aproximadamente 80,8% da variância total. Em uma avaliação inicial, a escolha de dois fatores pode ser considerada satisfatória, uma vez que a variância acumulada explicada supera o patamar de 70%, frequentemente adotado como referência na literatura.
+
+Entretanto, existem diferentes critérios para determinar o número adequado de fatores a serem retidos. Em uma análise preliminar, considerando que os autovalores não estão disponíveis, pode-se recorrer à proporção da variância explicada, já discutida anteriormente, bem como ao critério da comunalidade explicada, conforme descrito por @artesbarro. Adotando-se como referência o valor mínimo de 50% para as comunalidades, esse critério também conduz à retenção de dois fatores.
 
 \textbf{b) Interprete os fatores rotacionados}
 
-O problema já diz que a tabela 4.18 é proveniente da rotação de varimax. Desta maneira, é possível observar com mais clareza quais variáveis de fato dominam um constructo. Por exemplo: X2 (limpeza) possui uma carga de 0.96 no Fator 2, e quase zero no Fator 1, esse comportamento se deve a rotação, esse é um fator rotacionado, onde toda a explicação da limpeza foi "puxada" para uma coluna.
+O Fator 1 (F1) é definido positivamente por X3 (Falta de agilidade no atendimento) e X4 (Demora na concessão de crédito), e negativamente por X1 (Cordialidade dos vendedores) e X5 (Vendedores bem informados sobre os produtos da loja). Dessa forma, observa-se uma relação inversa entre os atributos associados a esse fator. Enquanto X3 e X4 representam características indesejáveis do atendimento, X1 e X5 correspondem a aspectos desejáveis. Assim, valores elevados de F1 estão associados a uma pior qualidade do serviço prestado. Portanto, uma interpretação adequada para esse fator é Ineficiência do Atendimento, uma vez que ele sintetiza aspectos relacionados à lentidão dos processos e à menor qualidade da interação com os clientes.
+
+O Fator 2 (F2) é caracterizado principalmente por X2 (Limpeza da Loja), que apresenta uma carga fatorial substancialmente superior às das demais variáveis. Como os demais loadings associados a esse fator possuem magnitudes reduzidas, conclui-se que F2 é essencialmente representado por esse atributo. Dessa forma, uma interpretação adequada para F2 é Ambiente da Loja, uma vez que esse fator reflete predominantemente as características relacionadas a esse aspecto.
 
 \textbf{c) Construa um diagrama de caminho que descreva a análise realizada. Descreva as respectivas equações.}
 
@@ -323,18 +314,38 @@ $X_5 - \mu_5 =  - 0.640F_1 + 0.569F_2 + \varepsilon_5$
 
 \textbf{d) Um analista reservou os dois fatores e determinou seus escores fatoriais. O diagrama de dispersão apresentado na Figura 4.7 descreve o comportamento desses escores. Nesse diagrama foi destacado um ponto (vide a flecha) referente a um determinado consumidor. Como você interpretaria a percepção desse consumidor em relacão aos demais? O analista conclui que se tratava de um valor aberrante multidimensional. Essa conclusão faz sentido?}
 
-Dada posição desse consumidor, que é próximo de 0 no escore fatorial do fator 1 e perto de -4 no escore fatorial do fator 2, é possível dizer que a percepção dele acerca da ineficiência do do atendimento é mediana, ou que a agilidade e cordialidade estão "na média". Porém, por outro lado, esse indivíduo tem uma percepção extremamente negativa do ambiente da loja (4 desvioes padrÕes abaixo da média), o que o torna inconsistente em relação à outras observações.
+Pela posição do consumidor no gráfico, observa-se que seu escore no Fator 1 é próximo de zero, indicando uma percepção próxima à média em relação à Ineficiência do Atendimento. Em contrapartida, seu escore no Fator 2 é substancialmente inferior ao dos demais consumidores, sugerindo uma avaliação bastante negativa do Ambiente da Loja.
+
+Ao comparar sua posição com a distribuição geral dos escores fatoriais, nota-se que o consumidor encontra-se relativamente afastado da nuvem principal de observações, principalmente na direção do Fator 2. Entretanto, a classificação formal como valor aberrante multidimensional requer a utilização de medidas específicas, como a distância de Mahalanobis, não podendo ser estabelecida apenas por inspeção visual do gráfico.
+
+## Pressupostos para resolução dos exercícios 4.3, 4.4, 4.8
+
+Para aplicar uma análise fatorial pelo método das CP utilizando a matriz de correlações policóricas, o seguindo roteiro foi estabelecido:
+
+- Verificação de Fatorabilidade
+
+- Definição Número de Fatores
+
+- Extração de Fatores
+
+- Interpretação dos fatores
+
+- Análise das comunalidades e Avaliação do ajuste do modelo
+
+- Estimação dos Escores Fatoriais
+
 
 ## 4.3 Artes e Barroso
 
 \textbf{Retome o enunciado do Exercício 2.5. Aplique uma análise fatorial pelo método das componentes principais utilizando a matriz de correlações policóricas. O conjunto de fatores deve explicar pelo menos 70\% da variabilidade total dos dados. Faça uma análise completa dos resultados.}
 
-
-\textbf{ A tabela 2.10 traz os dados da aba Medias de Pizza.xlsx, com informações sobre os valores médios e características físico-químicas avaliadas em amostras de dez marcas de pizzas. A lista das características está na tabela 2.9.}
+### Verificação de Fatorabilidade
 
 ```{r}
 #| echo: false
-#| tbl-cap: "Tabela 2.10 do livro Artes e Barroso"
+#| tbl-cap: "Matriz de correlações policóricas - Q 4.3"
+
+
 pizza <- read.csv("Pizza.csv") %>% select(-brand, -id)
 
 pizza_ord <- pizza %>%
@@ -359,7 +370,39 @@ pizza_ord <- pizza %>%
 
 matriz_poly <- polychoric(pizza_ord, max.cat = 11)$rho
 
-fit <- principal(matriz_poly, nfactors = 2, rotate = "varimax")
+kable(
+  round(matriz_poly, 4),
+  format = "latex",
+  booktabs = TRUE) %>%
+  kable_styling(latex_options = c("hold_position"))
+
+```
+
+A matriz de correlações policóricas não apresenta elementos fora da diagonal muito próximos de zero. Portanto, a análise fatorial será útil.
+
+### Definição do Número de Fatores
+
+```{r}
+#| echo: false
+#| fig-cap: "Scree-Plot dos dados Pizza.csv"
+
+autovalores <- eigen(matriz_poly)$values
+
+plot(autovalores, type = "b", pch = 19, col = "blue",
+     main = "Scree Plot - Pizza",
+     xlab = "Número do Componente",
+     ylab = "Autovalor (Variância)")
+```
+
+O Scree-plot denota que 3 fatores são suficientes para a análise Fatorial, atráves da análise do "ponto do cotovelo".
+
+###  Extração de Fatores
+
+```{r}
+#| echo: false
+#| tbl-cap: "Cargas fatoriais (rotação varimax), comunalidades e variância específica dos dados Pizza"
+
+fit <- principal(matriz_poly, nfactors = 3, rotate = "varimax")
 
 # cargas fatoriais
 cargas <- as.data.frame(unclass(fit$loadings))
@@ -374,6 +417,7 @@ cargas$ei <- fit$uniquenesses
 ss <- data.frame(
   RC1 = sum(cargas$RC1^2),
   RC2 = sum(cargas$RC2^2),
+  RC3 = sum(cargas$RC3^2),
   h2 = NA,
   ei = NA
 )
@@ -397,48 +441,209 @@ kable(
   align = "c",
   escape = FALSE,
   digits = 2,
-  col.names = c("F1", "F2", "$h^2$", "$\\psi$")
+  col.names = c("F1", "F2", "F3", "$h^2$", "$\\psi$")
 ) %>%
   kable_styling(
     latex_options = c("hold_position", "striped")
   )
 
-var_f1 <- 3.83/7
-var_f2 <- 2.21/7
+p <- nrow(cargas)
 
-var_exp <- var_f1 + var_f2
+var_f1 <- ss$RC1 / p
+var_f2 <- ss$RC2 / p
+var_f3 <- ss$RC3 / p
+
+var_total <- var_f1 + var_f2 + var_f3
 
 ```
 
-O constructo F1 é positivamente dominado por ash, sodium, prot e fat, e negativamente por carb. Portanto, podemos apontar F1 como perfil de ingredientes.
 
-O constructo F2 é positivamente delimitado por cal, e negativamente por mois. Logo, podemos apontar F2 como Calorias X umidade.
+### Interpretação dos fatores e Análise das comunalidades e Avaliação do ajuste do modelo
 
-A maior comunalidade pertence a Ash, indicando que a percepção acerca do perfil dos ingredientes é quase totalmente explicada pelos constructos do modelo, sendo um indicador confiável. A menor comunalidade pertence ao sódio, ou seja, fatores não capturados pelo modelo a influenciam.
+O Fator 1 (F1), possui carga fatorial relevante positiva para prot, ash e fat e negativa para carb. Esse padrão indica contraste entre alimentos com maiores teores proteína, gordura e cinzas e aqueles com maior concentração de carboidratos. Logo, é possível apontar que os atributos com maiores cargas fatoriais são associados a características da composição do recheio das pizzas, denotando à F1, uma interpretação adequada "Perfil do Recheio".
+
+Por sua vez, o Fator 2 (F2) apresenta carga fatorial relevante positiva para cal e negativa para mois. Esse padrão indica uma relação inversa entre calorias e umidade, de modo queprodutos com maiores escores nesse fator tendem a apresentar maior conteúdo calórico e menor teor de umidade. Dessa forma, uma interpretação adequada para F2 é Calorias versus Umidade, uma vez que o fator sintetiza o contraste entre a densidade energética e o conteúdo de água dos produtos.
+
+Por fim, o Fator 3 (F3) contém carga fatorial relevante positiva  positiva para sodium e ash. Esse comportamento indica que F3 possui uma interpretação adequada "Teor de Cinzas e Sódios", uma vez que apresenta baixa carga fatorial nos outros atributos.
+
+Observa-se que nem sempre é possível identificar exatamente o que o Fator está medindo, apenas é possível atribuir interpretações.
+
+A porcentagem da variância explicada foi de 92.59%, satisfatória e maior que os 70% que o exercício pediu.
+
+Ademais, é possível observar que as comunalidades são altas (maiores que 0.5) e próximas de 1. Logo, preliminarmente o modelo possui um bom ajuste. Outra maneira de verificar é comparar a matriz de covariâncias amostrais observada com a estimativa sob modelo:
+
+\begin{equation}
+\hat{\Sigma} = \hat{\Phi}\hat{\Phi}^{\top} + \hat{\Psi}.
+\label{eq:modelo_fatorial}
+\end{equation}
 
 ```{r}
 #| echo: false
-#| fig-cap: "Diagrama Fatorial 4.3"
-#| 
+#| tbl-cap: "Matriz de resíduos entre as correlações observadas e reproduzidas pelo modelo fatorial - Pizza"
 
-fa.diagram(
-  fit,
-  simple = FALSE,
-  digits = 2,
-  cut = 0,
-  main = "Diagrama Fatorial"
-)
+Psi <- diag(fit$uniquenesses)
+
+Lambda <- as.matrix(unclass(fit$loadings))
+
+Sigma_hat <- Lambda %*% t(Lambda) + Psi
+
+Residual <- matriz_poly - Sigma_hat
+
+kable(
+  round(Residual, 4),
+  format = "latex",
+  booktabs = TRUE) %>%
+  kable_styling(latex_options = c("hold_position"))
 ```
+
+Por meio da matriz de resíduos, observa-se que praticamente todos os resíduos apresentam magnitude reduzida e próxima de zero, sendo inferiores a 0,10 em valor absoluto, com exceção do par prot e mois, cujo resíduo é igual a −0.1058. Esse resultado indica que a matriz de correlações reproduzida pelo modelo é bastante semelhante à matriz observada. Portanto, a solução fatorial apresenta um bom ajuste, não havendo evidências de discrepâncias relevantes entre os dados observados e aqueles reproduzidos pelos fatores extraídos.
+
+### Códigos
+
+```{r}
+#| eval: false
+
+# verificação da fatorabilidade
+
+pizza <- read.csv("Pizza.csv") %>% select(-brand, -id)
+
+pizza_ord <- pizza %>%
+  mutate(across(
+    everything(),
+    \(x) {
+      cortes <- quantile(
+        x,
+        probs = seq(0, 1, length.out = 12),
+        na.rm = TRUE
+      )
+      cortes <- unique(cortes)
+      
+      cut(
+        x,
+        breaks = cortes,
+        include.lowest = TRUE,
+        labels = FALSE
+      ) - 1
+    }
+  ))
+
+matriz_poly <- polychoric(pizza_ord, max.cat = 11)$rho
+
+kable(
+  round(matriz_poly, 4),
+  format = "latex",
+  booktabs = TRUE) %>%
+  kable_styling(latex_options = c("hold_position"))
+
+# definição do número de fatores
+
+autovalores <- eigen(matriz_poly)$values
+
+plot(autovalores, type = "b", pch = 19, col = "blue",
+     main = "Scree Plot - Nutrientes de Pizza",
+     xlab = "Número do Componente",
+     ylab = "Autovalor (Variância)")
+
+# Extração de Fatores
+
+fit <- principal(matriz_poly, nfactors = 3, rotate = "varimax")
+
+# cargas fatoriais
+cargas <- as.data.frame(unclass(fit$loadings))
+
+# comunalidades
+cargas$h2 <- fit$communality
+
+# unicidades
+cargas$ei <- fit$uniquenesses
+
+# soma dos quadrados das cargas
+ss <- data.frame(
+  RC1 = sum(cargas$RC1^2),
+  RC2 = sum(cargas$RC2^2),
+  RC3 = sum(cargas$RC3^2),
+  h2 = NA,
+  ei = NA
+)
+
+cargas <- cargas %>% mutate(h2 = round(h2, 4),
+                            ei = round(ei, 4))
+
+# adiciona linha final
+tabela_final <- bind_rows(cargas, SS = ss)
+
+tabela_final$h2[is.na(tabela_final$h2)] <- ""
+tabela_final$ei[is.na(tabela_final$ei)] <- ""
+
+rownames(tabela_final)[8] <- "SS"
+
+# tabela latex
+kable(
+  tabela_final,
+  format = "latex",
+  booktabs = TRUE,
+  align = "c",
+  escape = FALSE,
+  digits = 2,
+  col.names = c("F1", "F2", "F3", "$h^2$", "$\\psi$")
+) %>%
+  kable_styling(
+    latex_options = c("hold_position", "striped")
+  )
+
+p <- nrow(cargas)
+
+var_f1 <- ss$RC1 / p
+var_f2 <- ss$RC2 / p
+var_f3 <- ss$RC3 / p
+
+var_total <- var_f1 + var_f2 + var_f3
+
+# Interpretação dos fatores e Análise das comunalidades e Avaliação do ajuste do modelo
+
+Psi <- diag(fit$uniquenesses)
+
+Lambda <- as.matrix(unclass(fit$loadings))
+
+Sigma_hat <- Lambda %*% t(Lambda) + Psi
+
+Residual <- matriz_poly - Sigma_hat
+
+kable(
+  round(Residual, 4),
+  format = "latex",
+  booktabs = TRUE) %>%
+  kable_styling(latex_options = c("hold_position"))
+```
+
+\newpage
 
 ## 4.4 Artes e Barroso
 
 \textbf{Retome o enunciado do Exercício 3.4. Aplique uma análise fatorial pelo método das componentes principais utilizando a matriz de correlações policóricas. O conjunto de fatores deve explicar pelo menos 70\% da variabilidade total dos dados. Faça uma análise completa dos resultados.}
 
+Dicionário das variáveis
+
+- FWB1_1: Capacidade de lidar com despesas inesperadas;
+- FWB1_2: Segurança financeira futura;
+- FWB1_3: Percepção de limitações financeiras para alcançar objetivos de vida;
+- FWB1_4: Capacidade de aproveitar a vida por meio da gestão financeira;
+- FWB1_5: Sensação de sobrevivência financeira;
+- FWB1_6: Preocupação com a suficiência dos recursos financeiros no futuro;
+- FWB2_1: Impacto financeiro de gastos extraordinários;
+- FWB2_2: Disponibilidade de recursos ao final do mês;
+- FWB2_3: Atrasos em compromissos financeiros;
+- FWB2_4: Percepção de controle das finanças sobre a vida.
+
+### Verificação de Fatorabilidade
+
 ```{r}
-
-#|eval: false
-
-dados <- read.csv("Q4_4.csv") %>% select(-PUF_ID)
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Matriz de correlações policóricas 1 de 2 - Q 4.4"
+dados <- read.csv("Q4_4.csv") %>% select(FWB1_1, FWB1_2, FWB1_3, FWB1_4, FWB1_5, FWB1_6,
+         FWB2_1, FWB2_2, FWB2_3, FWB2_4)
 
 dados_ord <- dados %>%
   mutate(across(
@@ -462,11 +667,346 @@ dados_ord <- dados %>%
 
 matriz_poly <- polychoric(dados_ord, max.cat = 11)$rho
 
-fit <- principal(matriz_poly, nfactors = 30, rotate = "varimax")
-
-print(fit)
+kable(
+  round(matriz_poly[, 1:5], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("hold_position")
+  )
 
 ```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Matriz de correlações policóricas 2 de 2 - Q 4.4"
+kable(
+  round(matriz_poly[, 6:10], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+```
+
+A matriz de correlações policóricas não apresenta elementos fora da diagonal muito próximos de zero. Portanto, a análise fatorial será útil.
+
+### Definição do Número de Fatores
+
+```{r}
+#| echo: false
+autovalores <- eigen(matriz_poly)$values
+
+plot(autovalores, type = "b", pch = 19, col = "blue",
+     main = "Scree Plot - BemEstarFin",
+     xlab = "Número do Componente",
+     ylab = "Autovalor (Variância)")
+```
+
+O Scree-plot denota que 2 fatores são suficientes para a análise Fatorial, atráves da análise do "ponto do cotovelo".
+
+###  Extração de Fatores
+
+```{r}
+#| echo: false
+#| tbl-cap: "Cargas fatoriais (rotação varimax), comunalidades e variância específica dos dados BemEstarFin"
+
+fit <- principal(matriz_poly, nfactors = 2, rotate = "varimax")
+
+# cargas fatoriais
+cargas <- as.data.frame(unclass(fit$loadings))
+
+# comunalidades
+cargas$h2 <- fit$communality
+
+# unicidades
+cargas$ei <- fit$uniquenesses
+
+ss <- data.frame(
+  RC1 = sum(cargas$RC1^2),
+  RC2 = sum(cargas$RC2^2),
+  h2 = NA,
+  ei = NA
+)
+
+# arredondamento
+cargas <- cargas %>%
+  mutate(
+    h2 = round(h2, 4),
+    ei = round(ei, 4)
+  )
+
+# adiciona linha SS
+tabela_final <- bind_rows(cargas, SS = ss)
+
+# substitui NAs por vazio
+tabela_final$h2[is.na(tabela_final$h2)] <- ""
+tabela_final$ei[is.na(tabela_final$ei)] <- ""
+
+# nome da última linha
+rownames(tabela_final)[nrow(tabela_final)] <- "SS"
+
+# evita erro com "_"
+rownames(tabela_final) <- gsub(
+  "_",
+  "\\\\_",
+  rownames(tabela_final)
+)
+
+# tabela LaTeX
+kable(
+  tabela_final,
+  format = "latex",
+  booktabs = TRUE,
+  align = "c",
+  escape = FALSE,
+  digits = 2,
+  col.names = c("F1", "F2", "$h^2$", "$\\psi$")
+) %>%
+  kable_styling(
+    latex_options = c("hold_position", "striped")
+  )
+
+# variância explicada
+p <- nrow(cargas)
+
+var_f1 <- ss$RC1 / p
+var_f2 <- ss$RC2 / p
+
+var_total <- var_f1 + var_f2
+
+```
+
+### Interpretação dos fatores e Análise das comunalidades e Avaliação do ajuste do modelo
+
+O Fator 1 (F1) possui carga fatorial relevante positiva para FWB1_3 (0.77), FWB2_4 (0.76), FWB1_5 (0.74), FWB1_6 (0.73) e FWB2_1 (0.71), que são:
+
+- FWB1_3: Percepção de limitações financeiras para alcançar objetivos de vida;
+- FWB2_4: Percepção de controle das finanças sobre a vida;
+- FWB1_5: Sensação de sobrevivência financeira;
+- FWB1_6: Preocupação com a suficiência dos recursos financeiros no futuro;
+- FWB2_1: Impacto financeiro de gastos extraordinários.
+
+Observa-se que as maiores cargas fatoriais de F1 estão associadas a variáveis relacionadas a preocupações, dificuldades e inseguranças financeiras. Dessa forma, os atributos que mais contribuem para a definição desse fator refletem aspectos ligados ao estresse decorrente da situação financeira dos indivíduos, justificando sua interpretação como "Stress Financeiro".
+
+Além disso, as cargas fatoriais negativas apresentam magnitudes relativamente menores, sendo as mais expressivas as de FWB2_2, com carga de −0,49, e FWB1_1, com carga de −0,36. Como ambas representam indicadores de maior segurança financeira, suas associações negativas reforçam a interpretação de F1: indivíduos com escores elevados nesse fator tendem a apresentar maior estresse financeiro e menor capacidade de lidar com imprevistos ou manter recursos disponíveis ao final do mês.
+
+- FWB2_2: Disponibilidade de recursos ao final do mês.
+- FWB1_1: Capacidade de lidar com despesas inesperadas;
+
+O Fator 2 (F2) possui carga fatorial relevante positiva para FWB1_2 (0.86), FWB1_4 (0.85), FWB1_1 (0.82) e FWB2_2 (0.70) que são:
+
+- FWB1_1: Capacidade de lidar com despesas inesperadas;
+- FWB1_2: Segurança financeira futura;
+- FWB1_4: Capacidade de aproveitar a vida por meio da gestão financeira;
+- FWB2_2: Disponibilidade de recursos ao final do mês.
+
+Observa-se que todas essas variáveis estão associadas a aspectos positivos do bem-estar financeiro, refletindo capacidade de planejamento, estabilidade econômica, disponibilidade de recursos e confiança em relação à situação financeira futura. Dessa forma, valores elevados de F2 estão associados a indivíduos que apresentam maior segurança e tranquilidade em relação às suas finanças.
+
+Adicionalmente, as maiores cargas negativas são observadas para FWB2_1 (-0,49), referente ao impacto financeiro de gastos extraordinários, e FWB1_3 (-0,35), relacionado à percepção de limitações financeiras para alcançar objetivos de vida. Embora apresentem magnitudes inferiores às principais cargas positivas, essas associações negativas reforçam a interpretação do fator, uma vez que representam características opostas à estabilidade financeira.
+
+- FWB2_1: Impacto financeiro de gastos extraordinários;
+- FWB1_3: Percepção de limitações financeiras para alcançar objetivos de vida;
+
+A porcentagem da variância explicada foi de 71.53%, pouco maior que os 70% exigidos pelo exercício.
+
+Por fim, é possível observar que as comunalidades são altas (maiores que 0.5), mas não tão próximas de 1. Logo, preliminarmente o modelo possui um ajuste razoável-bom. Outra maneira de verificar é comparar a matriz de covariâncias amostrais observada com a estimativa sob modelo:
+
+\begin{equation}
+\hat{\Sigma} = \hat{\Phi}\hat{\Phi}^{\top} + \hat{\Psi}.
+\label{eq:modelo_fatorial}
+\end{equation}
+
+```{r}
+#| echo: false
+#| tbl-cap: "Matriz de resíduos entre as correlações observadas e reproduzidas pelo modelo fatorial 1 de 2 - BemEstarFinanceiro"
+
+Psi <- diag(fit$uniquenesses)
+
+Lambda <- as.matrix(unclass(fit$loadings))
+
+Sigma_hat <- Lambda %*% t(Lambda) + Psi
+
+Residual <- matriz_poly - Sigma_hat
+
+kable(
+  round(Residual[, 1:5], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+```
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Matriz de resíduos entre as correlações observadas e reproduzidas pelo modelo fatorial 2 de 2 - BemEstarFinanceiro"
+
+kable(
+  round(Residual[, 6:10], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+```
+
+Por meio da matriz de resíduos, observa-se que a maioria dos resíduos apresenta magnitude reduzida, sendo inferior a 0,10 em valor absoluto. A única exceção relevante corresponde ao par FWB2_3 e FWB1_6, cujo resíduo é igual a −0.1206. Dessa forma, conclui-se que o modelo reproduz satisfatoriamente a estrutura de correlações observada, apresentando um ajuste global adequado, embora exista uma discrepância um pouco maior para esse par específico de variáveis.
+
+### Códigos
+
+```{r}
+
+#| eval: false
+
+dados <- read.csv("Q4_4.csv") %>% select(FWB1_1, 
+                                         FWB1_2, 
+                                         FWB1_3, 
+                                         FWB1_4, 
+                                         FWB1_5, 
+                                         FWB1_6,
+                                         FWB2_1, 
+                                         FWB2_2, 
+                                         FWB2_3, 
+                                         FWB2_4)
+
+dados_ord <- dados %>%
+  mutate(across(
+    everything(),
+    \(x) {
+      cortes <- quantile(
+        x,
+        probs = seq(0, 1, length.out = 11),
+        na.rm = TRUE
+      )
+      cortes <- unique(cortes)
+      
+      cut(
+        x,
+        breaks = cortes,
+        include.lowest = TRUE,
+        labels = FALSE
+      ) - 1
+    }
+  ))
+
+matriz_poly <- polychoric(dados_ord, max.cat = 11)$rho
+
+kable(
+  round(matriz_poly[, 1:5], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+
+autovalores <- eigen(matriz_poly)$values
+
+plot(autovalores, type = "b", pch = 19, col = "blue",
+     main = "Scree Plot - BemEstarFin",
+     xlab = "Número do Componente",
+     ylab = "Autovalor (Variância)")
+
+fit <- principal(matriz_poly, nfactors = 2, rotate = "varimax")
+
+# cargas fatoriais
+cargas <- as.data.frame(unclass(fit$loadings))
+
+# comunalidades
+cargas$h2 <- fit$communality
+
+# unicidades
+cargas$ei <- fit$uniquenesses
+
+ss <- data.frame(
+  RC1 = sum(cargas$RC1^2),
+  RC2 = sum(cargas$RC2^2),
+  h2 = NA,
+  ei = NA
+)
+
+# arredondamento
+cargas <- cargas %>%
+  mutate(
+    h2 = round(h2, 4),
+    ei = round(ei, 4)
+  )
+
+# adiciona linha SS
+tabela_final <- bind_rows(cargas, SS = ss)
+
+# substitui NAs por vazio
+tabela_final$h2[is.na(tabela_final$h2)] <- ""
+tabela_final$ei[is.na(tabela_final$ei)] <- ""
+
+# nome da última linha
+rownames(tabela_final)[nrow(tabela_final)] <- "SS"
+
+# evita erro com "_"
+rownames(tabela_final) <- gsub(
+  "_",
+  "\\\\_",
+  rownames(tabela_final)
+)
+
+# tabela LaTeX
+kable(
+  tabela_final,
+  format = "latex",
+  booktabs = TRUE,
+  align = "c",
+  escape = FALSE,
+  digits = 2,
+  col.names = c("F1", "F2", "$h^2$", "$\\psi$")
+) %>%
+  kable_styling(
+    latex_options = c("hold_position", "striped")
+  )
+
+# variância explicada
+p <- nrow(cargas)
+
+var_f1 <- ss$RC1 / p
+var_f2 <- ss$RC2 / p
+
+var_total <- var_f1 + var_f2
+
+Psi <- diag(fit$uniquenesses)
+
+Lambda <- as.matrix(unclass(fit$loadings))
+
+Sigma_hat <- Lambda %*% t(Lambda) + Psi
+
+Residual <- matriz_poly - Sigma_hat
+
+kable(
+  round(Residual[, 1:5], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+
+kable(
+  round(Residual[, 6:10], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+```
+
+\newpage
 
 ## 4.8 Artes e Barroso
 
@@ -476,9 +1016,9 @@ Devido a não encontrar esses dados para download a análise não foi possível
 
 \textbf{Num estudo planejado para avaliar o nível de poluição atmosférica por meio de medidas de elementos químicos depositados em cascas de árvores, obtiveram-se observações da concentração Al, Ba, Cu, Fe, Zn, P, Cl, Sr e Ca entre outros
 elementos em 193 unidades da espécie Tipuana tipu na cidade de São Paulo. Esses
-dados estão disponíveis no arquivo arvores.xls
+dados estão disponíveis no arquivo arvores.xls}
 
-Realize uma análise fatorial com o objetivo de obter um conjunto de fatores que permitam identificar características comuns a essas variáveis.}
+\textbf{Realize uma análise fatorial com o objetivo de obter um conjunto de fatores que permitam identificar características comuns a essas variáveis.}
 
 ```{r}
 
@@ -501,4 +1041,5 @@ res5 <- round(mcor - (af5arvores$loadings %*% t(af5arvores$loadings) + diag(af5a
 print(af5arvores, digits = 3)
 print(res5)
 ```
+
 
