@@ -307,28 +307,9 @@ A <- Biplot(Dados, linlab=cerveja$Marca, size=0, grid=FALSE)
 
 ```
 
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-#| fig-cap: "Painel B"
-#| fig-width: 6
-#| fig-height: 6
-
-x <- A$coorI[,1]
-y <- A$coorI[,2]
-plot(x,y, type = "n",
-     xlab = "Coordenada 1",
-     ylab = "Coordenada 2",
-     main = "Painel B",
-     asp = 1)
-text(x, y, rownames(DC), cex=1)
-```
-
-
 \textbf{b) Avalie a qualidade da solução em duas dimensões}
 
-Para calcular a qualidade da solução, devemos pegar a soma dos dois primeiros autovalores e dividir pela soma de todos os autovalores, pois os autovalores representam a variância associada às dimensões do EMD.
+Para calcular a qualidade da solução, devemos utilizar a soma dos dois primeiros autovalores e dividir pela soma de todos os autovalores, pois os autovalores representam a variância associada às dimensões do EMD.
 
 ```{r}
 eig <- EMD_cerveja$eig
@@ -370,7 +351,7 @@ Os grupos observáveis são:
 
 ## Questão 5.2 Artes e Barroso
 
-\textbf{O site Laptop Mag avalia marcas de laptops disponíveis no mercado americano. O arquivo Notebook.xlsx traz um resumo de avaliações realizadas em 2020, apresnetadas na tabela 5.10. As avaliações foram convertidas para uma escala de 0 a 10. Avalie as marcas utilizando um mapa perceptual.}
+\textbf{O site Laptop Mag avalia marcas de laptops disponíveis no mercado americano. O arquivo Notebook.xlsx traz um resumo de avaliações realizadas em 2020, apresentadas na tabela 5.10. As avaliações foram convertidas para uma escala de 0 a 10. Avalie as marcas utilizando um mapa perceptual.}
 
 ```{r}
 #| include: false
@@ -420,8 +401,13 @@ Microsoft  & 7.75 & 7.33  & 7.50 & 4.00  & 6.00 \\
 \end{tabular}
 \end{table}
 
+Seguindo o passo a passo:
+
+1 - Obtenção da matriz de distâncias euclidianas
+
 ```{r}
-#| tbl-cap: "Matriz de distâncias euclidianas - Notebooks"
+#| echo: false
+#| tbl-cap: Matriz de distâncias euclidianas - Notebooks
 
 DistNote <- dist(cbind(notebooks$Qualidade, 
                        notebooks$Design, notebooks$Suporte, 
@@ -435,6 +421,8 @@ colnames(DN) <- notebooks$Marca
 
 knitr::kable(round(as.matrix(DistNote), 4))
 ```
+
+2 - Escalonamento Multimensional métrico
 
 ```{r}
 #| fig-width: 6

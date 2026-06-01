@@ -1,0 +1,677 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+    fig-cap-location: top
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{Redução de Dimensionalidade: Escalonamento Multidimensional}}
+
+\vspace{2.5cm}
+
+{\large Carlos César Yoshitake}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Resolução da Lista 7 da disciplina Análise Multivariada.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\singlespacing
+
+# Questões
+
+## Questão 5.1 Artes e Barroso
+
+\textbf{Consumidores de cerveja avaliaram alguns atributos, relacionados a diferentes marcas, segundo uma escala Likert de pontos. Pontuações altas representam avaliações positivas a cada um dos atributos. Foram avaliadas as satisfações dos clientes em relação ao Preço, Sabor, Qualidade e Propaganda. A tabela 5.9 resume as avaliações médias observadas.}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: Tabela 5.9 do Livro - Avaliação média de atributos associados a marcas de cervejas
+
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(MVar.pt)
+
+cerveja <- data.frame(
+  Marca = c("Brahma", "Skol", "Budweiser", "Heineken",
+            "Stella Artois", "Antarctica", "Original"),
+  Preco = c(3.61, 3.48, 3.40, 3.48, 3.37, 3.24, 3.39),
+  Sabor = c(3.19, 2.81, 4.09, 4.22, 4.10, 2.64, 3.99),
+  Qualidade = c(3.39, 2.88, 4.03, 4.14, 4.04, 2.74, 3.95),
+  Propaganda = c(2.54, 2.76, 2.57, 3.03, 2.52, 2.30, 2.33)
+)
+
+cerveja |>
+  kbl(
+    format = "latex",
+    booktabs = TRUE,
+    align = c("l", "c", "c", "c", "c"),
+    col.names = c("Marca", "Preço", "Sabor", "Qualidade", "Propaganda"),
+    digits = 2
+  ) |>
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+```
+
+\textbf{a) Realize um EM métrico utilizando os dados da Tabela 5.9}
+
+O primeiro passo para realizar um EM métrico é calcular a matriz de distâncias euclidianas, atráves da função \texttt{dist()} do software R base.
+
+```{r}
+#| echo: false
+#| tbl-cap: Matriz de distâncias euclidianas - Cerveja
+
+DistCerveja <- dist(cbind(cerveja$Propaganda, 
+                          cerveja$Qualidade, 
+                          cerveja$Sabor, 
+                          cerveja$Preco), 
+                    method = "euclidean", diag = TRUE)
+
+knitr::kable(round(as.matrix(DistCerveja), 4))
+
+```
+
+O segundo passo é utilizar a matriz de distâncias como parâmetro da função \texttt{cmdsale()}, também do software R base. Com o retorno da função é possível gerar um gráfico onde os grupos serão expostos.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Gráfico EM métrico"
+#| fig-width: 5
+#| fig-height: 5
+#| fig-pos: "H"
+
+DC <- as.matrix(DistCerveja)
+
+rownames(DC) <- cerveja$Marca
+colnames(DC) <- cerveja$Marca
+
+EMD_cerveja <- cmdscale(DC, eig=TRUE, k=2)
+
+x <- EMD_cerveja$points[,1]
+y <- EMD_cerveja$points[,2]
+
+plot(x,y, type = "n",
+     xlab="Dimensão 1",
+     ylab="Dimensão 2",
+     main="Painel A")
+text(x,y, rownames(DC), cex=1)
+abline(h=0, lty=2)
+abline(v=0, lty=2)
+```
+
+\textbf{b) Avalie a qualidade da solução em duas dimensões}
+
+Para calcular a qualidade da solução, devemos utilizar a soma dos dois primeiros autovalores e dividir pela soma de todos os autovalores, pois os autovalores representam a variância associada às dimensões do EMD.
+
+```{r}
+
+eig <- EMD_cerveja$eig
+qualidade <- sum(eig[1:2]) / sum(eig[eig > 0])
+qualidade
+
+```
+qualidade próxima de 100%, ótima.
+
+\textbf{c) Interprete os eixos de uma solução em duas dimensões}
+
+Para interpretar as dimensões da solução bidimensional obtida pelo escalonamento multidimensional, foi construído um Biplot utilizando a função \texttt{Biplot()} do pacote \texttt{MVar.pt}. Os vetores dos atributos permitem identificar quais características estão mais associadas a cada dimensão do mapa perceptual.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Biplot EM"
+#| label: fig-biplot
+#| fig-width: 5
+#| fig-height: 5
+#| fig-pos: "H"
+
+
+library(MVar.pt)
+
+cervejaMat <- as.matrix(cbind(cerveja$Propaganda, cerveja$Qualidade, cerveja$Sabor, cerveja$Preco))
+
+rownames(cervejaMat) <- cerveja$Marca
+
+colnames(cervejaMat) <- c("Propaganda", "Qualidade", "Sabor", "Preco")
+
+Dados <- as.data.frame(cervejaMat)
+
+A <- Biplot(Dados, linlab=cerveja$Marca, size=0, grid=FALSE)
+
+```
+
+Observa-se que a Dimensão 1 está fortemente associada aos atributos qualidade e sabor. Dessa forma, essa dimensão pode ser interpretada como um eixo relacionado à percepção da qualidade intrínseca das cervejas.
+
+A Dimensão 2 apresenta maior associação com o atributo propaganda e, em menor intensidade, com preço. Assim, essa dimensão pode ser interpretada como um eixo relacionado ao posicionamento de marketing e à exposição das marcas ao consumidor.
+
+Além disso, a proximidade entre os vetores de qualidade e sabor sugere uma associação positiva entre esses atributos, indicando que cervejas percebidas como mais saborosas tendem também a ser avaliadas como de maior qualidade.
+
+\textbf{d) Faça uma análise completa dos resultados, identifique grupos de mercas percebidas como semelhantes e caracterize os grupos. Sugestão: Utilize o biplot.}
+
+Com base na @fig-biplot, é possível notar  que 91,7% da informação está na dimensão 1, no eixo X.
+
+Os grupos observáveis são:
+
+1 - Heineken é a marca com posição mais alta em ambas as dimensões, ou seja, ela tem qualidade e sabor, mas também é cara e tem muita propaganda;
+
+2 - Stella Artois e Original estão bem pontuadas em qualidade e sabor, com menos propagandas e preço mais baixo;
+
+3 - Budweiser e Brahma estão próximas do centro no Biplot, ou seja, são medianas em ambas as dimensões, com qualidade e sabor médio, propaganda e preço médio. Embora a Budweiser possua um pouco mais de qualidade e menos preço e propaganda;
+
+4 - Skol na lanterna da qualidade e sabor, é a que mais possui propangada depois da Heineken, além de ser a segunda mais cara também;
+
+5 - Antarctica se apresenta como a pior opção, com qualidade e sabor muito atrás das outras, muito menos propaganda, mas como ponto positivo é a mais barata.
+
+### Códigos
+
+```{r}
+#| message: false
+#| warning: false
+#| eval: false
+
+library(dplyr)
+library(knitr)
+library(kableExtra)
+library(ggplot2)
+library(MVar.pt)
+
+cerveja <- data.frame(
+  Marca = c("Brahma", "Skol", "Budweiser", "Heineken",
+            "Stella Artois", "Antarctica", "Original"),
+  Preco = c(3.61, 3.48, 3.40, 3.48, 3.37, 3.24, 3.39),
+  Sabor = c(3.19, 2.81, 4.09, 4.22, 4.10, 2.64, 3.99),
+  Qualidade = c(3.39, 2.88, 4.03, 4.14, 4.04, 2.74, 3.95),
+  Propaganda = c(2.54, 2.76, 2.57, 3.03, 2.52, 2.30, 2.33)
+)
+
+cerveja |>
+  kbl(
+    format = "latex",
+    booktabs = TRUE,
+    align = c("l", "c", "c", "c", "c"),
+    col.names = c("Marca", "Preço", "Sabor", "Qualidade", "Propaganda"),
+    digits = 2
+  ) |>
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+
+# Matriz de distancias
+
+DistCerveja <- dist(cbind(cerveja$Propaganda, 
+                          cerveja$Qualidade, 
+                          cerveja$Sabor, 
+                          cerveja$Preco), 
+                    method = "euclidean", diag = TRUE)
+
+knitr::kable(round(as.matrix(DistCerveja), 4))
+
+# "Gráfico EM métrico"
+
+DC <- as.matrix(DistCerveja)
+
+rownames(DC) <- cerveja$Marca
+colnames(DC) <- cerveja$Marca
+
+EMD_cerveja <- cmdscale(DC, eig=TRUE, k=2)
+
+x <- EMD_cerveja$points[,1]
+y <- EMD_cerveja$points[,2]
+
+plot(x,y, type = "n",
+     xlab="Dimensão 1",
+     ylab="Dimensão 2",
+     main="Painel A")
+text(x,y, rownames(DC), cex=1)
+abline(h=0, lty=2)
+abline(v=0, lty=2)
+
+# qualidade
+
+eig <- EMD_cerveja$eig
+qualidade <- sum(eig[1:2]) / sum(eig[eig > 0])
+qualidade
+
+# Biplot
+
+cervejaMat <- as.matrix(cbind(cerveja$Propaganda, cerveja$Qualidade, cerveja$Sabor, cerveja$Preco))
+
+rownames(cervejaMat) <- cerveja$Marca
+
+colnames(cervejaMat) <- c("Propaganda", "Qualidade", "Sabor", "Preco")
+
+Dados <- as.data.frame(cervejaMat)
+
+A <- Biplot(Dados, linlab=cerveja$Marca, size=0, grid=FALSE)
+
+```
+
+\newpage
+
+## Questão 5.2 Artes e Barroso
+
+\textbf{O site Laptop Mag avalia marcas de laptops disponíveis no mercado americano. O arquivo Notebook.xlsx traz um resumo de avaliações realizadas em 2020, apresentadas na tabela 5.10. As avaliações foram convertidas para uma escala de 0 a 10. Avalie as marcas utilizando um mapa perceptual.}
+
+```{r}
+#| echo: false
+
+
+notebooks <- data.frame(
+  Marca = c("Asus", "Dell", "HP", "MSI", "Lenovo",
+            "Acer", "Razer", "Samsung", "Alienware",
+            "Apple", "Microsoft"),
+  
+  Qualidade = c(9.00, 9.00, 8.25, 8.50, 7.75,
+                7.75, 8.25, 7.75, 8.25, 8.25, 7.75),
+  
+  Design = c(10.00, 8.00, 9.33, 8.67, 8.00,
+             7.33, 8.00, 9.33, 8.67, 7.33, 7.33),
+  
+  Suporte = c(6.50, 7.00, 6.00, 6.00, 7.00,
+              5.50, 9.00, 7.00, 7.50, 8.50, 7.50),
+  
+  Inovacao = c(10.00, 9.00, 9.00, 8.00, 6.00,
+               9.00, 6.00, 8.00, 7.00, 6.00, 4.00),
+  
+  Variedade = c(9.33, 9.33, 9.33, 7.33, 9.33,
+                9.33, 4.67, 5.33, 4.67, 4.00, 6.00)
+)
+
+notebooks |>
+  kbl(
+    format = "latex",
+    booktabs = TRUE,
+    align = c("l", "c", "c", "c", "c"),
+    col.names = c("Marca", "Qualidade", "Design", "Suporte", "Inovacao", "Variedade"),
+    digits = 2
+  ) |>
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+
+```
+
+O primeiro passo para realizar um EM métrico e gerar um mapa perceptual é calcular a matriz de distâncias euclidianas, atráves da função \texttt{dist()} do software R base.
+
+```{r}
+#| echo: false
+#| tbl-cap: "Matriz de distâncias euclidianas - Notebooks"
+
+DistNote <- dist(cbind(notebooks$Qualidade, 
+                       notebooks$Design, notebooks$Suporte, 
+                       notebooks$Inovacao, notebooks$Variedade), 
+                 method="euclidean", diag=TRUE)
+
+DN <- as.matrix(DistNote)
+
+rownames(DN) <- notebooks$Marca    
+colnames(DN) <- notebooks$Marca
+
+knitr::kable(round(as.matrix(DistNote), 4))
+
+```
+
+O segundo passo é utilizar a matriz de distâncias como parâmetro da função \texttt{cmdsale()}, também do software R base. Com o retorno da função é possível gerar um gráfico onde os grupos serão expostos.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Mapa perceptual - Notebooks"
+#| label: fig-percep
+#| fig-width: 5
+#| fig-height: 5
+#| fig-pos: "H"
+
+EMD_note <- cmdscale(DN, eig=TRUE, k=2)
+
+mds <- cmdscale(DN, k = 2)
+
+df <- data.frame(x = mds[,1], y = mds[,2],
+                 marca = rownames(DN))
+
+ggplot(df, aes(x, y, label = marca)) +
+  geom_point() +
+  geom_text(vjust = -0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(
+    x = "Dimensão 1",
+    y = "Dimensão 2"
+  ) +
+  theme_minimal()
+```
+
+Utilizando apenas o mapa perceptual, é possível identificar grupos de marcas com perfis semelhantes de avaliação, mas não compreender diretamente quais atributos são responsáveis por tais agrupamentos.
+
+Ao observar a @fig-percep, nota-se que Apple e Razer apresentam posições bastante próximas, sugerindo percepções semelhantes por parte dos consumidores. De forma análoga, Acer, Dell e HP formam outro agrupamento relativamente coeso, enquanto Alienware e Samsung também se encontram próximas entre si. Por outro lado, Microsoft, Lenovo, MSI e Asus aparecem mais isoladas no mapa, não apresentando proximidade expressiva com outras marcas.
+
+Entretanto, a análise das posições das marcas, por si só, não permite compreender os fatores que explicam essas semelhanças e diferenças. Para interpretar o significado das dimensões do mapa perceptual, é necessário investigar os atributos associados a cada eixo, por meio da correlação entre as coordenadas obtidas no escalonamento multidimensional e as variáveis originais do estudo.
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Correlações entre os atributos e as dimensões do mapa perceptual"
+
+cor_dim1 <- cor(mds[,1], notebooks[, -1])
+cor_dim2 <- cor(mds[,2], notebooks[, -1])
+
+tabela_cor <- data.frame(
+  Atributo = colnames(notebooks[, -1]),
+  `Dimensão 1` = round(as.numeric(cor_dim1), 3),
+  `Dimensão 2` = round(as.numeric(cor_dim2), 3)
+)
+
+library(knitr)
+library(kableExtra)
+
+kbl(
+  tabela_cor,
+  format = "latex",
+  booktabs = TRUE,
+  align = c("l", "c", "c")
+) |>
+  add_header_above(c(" " = 1, "Correlações" = 2)) |>
+  kable_styling(
+    latex_options = "HOLD_position"
+  )
+```
+
+A Dimensão 1 apresentou correlações elevadas com os atributos variedade (0,935), inovação (0,846) e suporte (-0,841). Dessa forma, essa dimensão pode ser interpretada como um eixo que contrapõe marcas percebidas como inovadoras e com ampla variedade de produtos àquelas reconhecidas principalmente pela qualidade do suporte oferecido ao consumidor.
+
+A Dimensão 2 apresentou correlações mais elevadas com os atributos design (-0,641), inovação (-0,510) e qualidade (-0,430). Assim, essa dimensão pode ser interpretada como um eixo associado à percepção de qualidade, design e inovação das marcas de notebooks.
+
+Dessa forma, é possível entender os agrumentos de forma mais clara:
+
+- Apple e Razer formam o agrupamento mais evidente do mapa. Ambas são percebidas de maneira muito semelhante, destacando-se pelo suporte relativamente elevado e por menores níveis de variedade quando comparadas às marcas localizadas à direita do gráfico.
+- Dell, HP e Acer formam outro grupo bastante coeso. Como estão à direita do mapa, tendem a ser associadas a maior variedade de produtos e maior inovação.
+- Alienware e Samsung aparecem relativamente próximas na região inferior esquerda. Pela posição vertical, destacam-se por avaliações mais favoráveis em qualidade e design, mas sem apresentar a mesma variedade observada em marcas localizadas mais à direita.
+
+E as marcas isoladas:
+
+- Microsoft encontra-se isolada no quadrante superior esquerdo. Sua posição sugere uma percepção distinta das demais marcas, associada a maior suporte, porém com avaliações menos favoráveis nos atributos qualidade, design e inovação.
+- Lenovo aparece isolada na região superior do mapa. Embora esteja associada à variedade e inovação (posição à direita), diferencia-se das demais por apresentar menor associação com qualidade e design.
+- Asus ocupa uma posição extrema no quadrante inferior direito. Essa localização sugere uma combinação de alta variedade de produtos e avaliações favoráveis em qualidade e design, tornando-a uma das marcas mais diferenciadas do conjunto analisado.
+- MSI encontra-se próxima ao centro do mapa, indicando um perfil intermediário, sem associação particularmente forte com nenhum dos polos das duas dimensões.
+
+Além disso, observa-se que inovação apresenta correlação relevante com ambas as dimensões, sugerindo que esse atributo desempenha papel importante na diferenciação das marcas no mapa perceptual.
+
+Por fim, para calcular a qualidade da solução, devemos utilizar a soma dos dois primeiros autovalores e dividir pela soma de todos os autovalores, pois os autovalores representam a variância associada às dimensões do EMD.
+
+```{r}
+eig <- EMD_note$eig
+qualidade <- sum(eig[1:2]) / sum(eig[eig > 0])
+qualidade
+```
+
+Satisfatória.
+
+### Códigos
+
+```{r}
+#| message: false
+#| warning: false
+#| eval: false
+
+
+notebooks <- data.frame(
+  Marca = c("Asus", "Dell", "HP", "MSI", "Lenovo",
+            "Acer", "Razer", "Samsung", "Alienware",
+            "Apple", "Microsoft"),
+  
+  Qualidade = c(9.00, 9.00, 8.25, 8.50, 7.75,
+                7.75, 8.25, 7.75, 8.25, 8.25, 7.75),
+  
+  Design = c(10.00, 8.00, 9.33, 8.67, 8.00,
+             7.33, 8.00, 9.33, 8.67, 7.33, 7.33),
+  
+  Suporte = c(6.50, 7.00, 6.00, 6.00, 7.00,
+              5.50, 9.00, 7.00, 7.50, 8.50, 7.50),
+  
+  Inovacao = c(10.00, 9.00, 9.00, 8.00, 6.00,
+               9.00, 6.00, 8.00, 7.00, 6.00, 4.00),
+  
+  Variedade = c(9.33, 9.33, 9.33, 7.33, 9.33,
+                9.33, 4.67, 5.33, 4.67, 4.00, 6.00)
+)
+
+notebooks |>
+  kbl(
+    format = "latex",
+    booktabs = TRUE,
+    align = c("l", "c", "c", "c", "c"),
+    col.names = c("Marca", "Qualidade", "Design", "Suporte", "Inovacao", "Variedade"),
+    digits = 2
+  ) |>
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+
+# matriz distancias
+
+DistNote <- dist(cbind(notebooks$Qualidade, 
+                       notebooks$Design, notebooks$Suporte, 
+                       notebooks$Inovacao, notebooks$Variedade), 
+                 method="euclidean", diag=TRUE)
+
+DN <- as.matrix(DistNote)
+
+rownames(DN) <- notebooks$Marca    
+colnames(DN) <- notebooks$Marca
+
+knitr::kable(round(as.matrix(DistNote), 4))
+
+# EMD e grafico
+
+EMD_note <- cmdscale(DN, eig=TRUE, k=2)
+
+mds <- cmdscale(DN, k = 2)
+
+df <- data.frame(x = mds[,1], y = mds[,2],
+                 marca = rownames(DN))
+
+ggplot(df, aes(x, y, label = marca)) +
+  geom_point() +
+  geom_text(vjust = -0.5) +
+  geom_hline(yintercept = 0, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  labs(
+    x = "Dimensão 1",
+    y = "Dimensão 2"
+  ) +
+  theme_minimal()
+
+# Correlacoes
+
+cor_dim1 <- cor(mds[,1], notebooks[, -1])
+cor_dim2 <- cor(mds[,2], notebooks[, -1])
+
+tabela_cor <- data.frame(
+  Atributo = colnames(notebooks[, -1]),
+  `Dimensão 1` = round(as.numeric(cor_dim1), 3),
+  `Dimensão 2` = round(as.numeric(cor_dim2), 3)
+)
+
+library(knitr)
+library(kableExtra)
+
+kbl(
+  tabela_cor,
+  format = "latex",
+  booktabs = TRUE,
+  align = c("l", "c", "c")
+) |>
+  add_header_above(c(" " = 1, "Correlações" = 2)) |>
+  kable_styling(
+    latex_options = "HOLD_position"
+  )
+
+
+# qualidade
+
+eig <- EMD_note$eig
+qualidade <- sum(eig[1:2]) / sum(eig[eig > 0])
+qualidade
+
+```
