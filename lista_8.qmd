@@ -863,7 +863,7 @@ resultado <- ca(N)
 plot(resultado)
 
 ```
-Observa-se na figura @fig-typeturn, que mochilas de carrinho estão associadas a escoliose-direita, enquanto lateral parece distante sem associações claras. Já as mochilas escapulares estão associadas a escoliose-esquerda e à ausência de escoliose. Ademais, é possível observar também que a Dimensão 1 explica 99.1% da inércia total
+Observa-se na figura @fig-typeturn, que mochilas de carrinho estão associadas a escoliose-direita, enquanto lateral parece distante sem associações claras. Já as mochilas escapulares estão associadas a escoliose-esquerda e à ausência de escoliose. Ademais, é possível observar também que a Dimensão 1 explica 99.1% da inércia total.
 
 \textbf{b) Agrupe as categorias da variável ModoCarregar em três categorias (1: nos dois ombros + no tronco, 2: em um ombro + na mão direita + na mão esquerda, 3: outros) e com elas faça uma análise de correspondência simples versus Escoliose. Comente.
 }
@@ -1130,7 +1130,100 @@ Dessa forma, as análises separadas permitiram identificar associações especí
 
 ## Questão 6.5 Artes e Barroso
 
+\textbf{a) Agrupe o número de habitantes de acordo com as seguintes faixas etárias: até 17 anos, de 18 a 29 anos, de 30 a 49, de 50 a 64 e 65 ou mais anos. Faça os mapas da análise de correspondência simples de região versus faixa etária. Interprete os resultados.
+}
 
+```{r}
+#| label: fig-regage
+#| message: false
+#| warning: false
+#| fig-cap: Mapa de correspondências - Região X Faixa Etária
+#| fig-height: 5
+#| fig-width: 6
+
+populacao <- data.frame(
+  Etaria = c("0 a 4 anos", "5 a 13 anos", "14 a 17 anos", "18 a 19 anos", 
+             "20 a 24 anos", "25 a 29 anos", "30 a 39 anos", "40 a 49 anos",
+             "50 a 59 anos", "60 a 64 anos", "65 anos ou mais", "Total"),
+  Norte = c(1591, 2771, 1337, 642, 1683, 1704, 2951, 2363, 1693, 613, 1231, 18579),
+  Nordeste = c(4136, 7832, 3711, 1798, 4830, 4695, 9099, 7848, 6046, 2202, 5325, 57522),
+  Sudeste = c(5593, 10028, 4717, 2433, 6961, 6766, 14390, 12983, 10831, 4605, 10304, 89611),
+  Sul = c(2037, 3516, 1589, 776, 2181, 2392, 4983, 4209, 3773, 1560, 3343, 30359),
+  C_Oeste = c(1300, 2132, 954, 491, 1349, 1401, 2730, 2359, 1816, 661, 1388, 16581),
+  Total = c(14657, 26279, 12308, 6140, 17004, 16958, 34153, 29762, 24159, 9641, 21591, 212652)
+)
+
+populacao$nova_faixa <- c(
+  "até 17 anos",      # 0-4
+  "até 17 anos",      # 5-13
+  "até 17 anos",      # 14-17
+  "18 a 29 anos",     # 18-19
+  "18 a 29 anos",     # 20-24
+  "18 a 29 anos",     # 25-29
+  "30 a 49 anos",     # 30-39
+  "30 a 49 anos",     # 40-49
+  "50 a 64 anos",     # 50-59
+  "50 a 64 anos",     # 60-64
+  "65 ou mais anos",  # 65+
+  NA                  # Total (vai ser removido)
+)
+
+populacao <- subset(populacao, !is.na(nova_faixa))
+
+tab <- populacao %>%
+  group_by(nova_faixa) %>%
+  summarise(
+    Norte = sum(Norte),
+    Nordeste = sum(Nordeste),
+    Sudeste = sum(Sudeste),
+    Sul = sum(Sul),
+    C_Oeste = sum(C_Oeste)
+  )
+
+rownames(tab) <- tab$nova_faixa
+matriz <- as.matrix(tab[,-1])
+
+rownames(matriz) <- as.character(tab$nova_faixa)
+colnames(matriz) <- colnames(tab)[-1]
+
+res <- ca(matriz)
+
+plot(res)
+
+
+```
+
+Observa-se, por meio da Figura @fig-regage, uma estrutura de associação entre regiões e faixas etárias, com predominância explicativa da primeira dimensão. Nota-se que as regiões Sul e Sudeste apresentam maior proximidade com as faixas etárias de 30 a 49 anos e 50 a 64 anos, sugerindo um perfil etário mais envelhecido em comparação às demais regiões. Por outro lado, as regiões Nordeste e Centro-Oeste tendem a se aproximar das faixas etárias mais jovens, especialmente até 17 anos e de 18 a 29 anos, indicando uma estrutura demográfica relativamente mais jovem nesses agrupamentos. A faixa etária de 65 anos ou mais, assim como a região Norte, encontram-se mais próximas da origem do plano fatorial, o que indica um perfil mais próximo da média global, sem associações fortes com categorias específicas no espaço bidimensional.
+
+\textbf{b) Quantos eixos seriam necessários para explicar 100% da inércia total? }
+
+Por meio da função \texttt{summary()}, quando utilizada na saída da função \texttt{ca()}, é possível entender quantos % da inércia total são explicados por cada dimensão.
+
+```{r}
+#| message: false
+#| warning: false
+summary(res)
+```
+Logo, com 4 dimensões seria possível explicar 100% da inércia total.
+
+\textbf{c) Qual é a porcentagem da inércia principal explicada por cada um dos eixos?}
+
+- Dimensão 1: 97.6%
+- Dimensão 2: 1.5%
+- Dimensão 3: 0.6%
+- Dimensão 4: 0.2%
+
+\textbf{d) Qual é a qualidade da representação de cada categoria de região e de faixa etária?}
+
+Observa-se que, de modo geral, tanto as regiões quanto as faixas etárias apresentam alta qualidade de representação no plano fatorial, com valores de qlt predominantemente acima de 0,94, indicando que suas posições no mapa são bem explicadas pelas duas dimensões.
+
+\textbf{e) Qual é a região que mais explica a inércia dos eixos do mapa? De quanto?}
+
+A região que mais contribui para a formação da Dimensão 1 é o Norte, com contribuição de aproximadamente 425, sendo a principal responsável pela estrutura de separação observada no eixo. Já na Dimensão 2, a maior contribuição é da região Centro-Oeste, com valor de aproximadamente 551, indicando que esta região é a principal responsável pela variabilidade capturada no segundo eixo do mapa fatorial.
+
+\textbf{f) Qual é a contribuição dos eixos para cada categoria de faixa etária?}
+
+As contribuições das faixas etárias indicam que a Dimensão 1 é fortemente influenciada pelas categorias “até 17 anos”, “18 a 29 anos” e “65 anos ou mais”, sendo estas as principais responsáveis pela estrutura de separação observada no eixo horizontal do mapa. Já a Dimensão 2 é majoritariamente determinada pela faixa etária de “65 anos ou mais”, seguida pelas faixas “50 a 64 anos” e “14 a 17 anos”, indicando que o segundo eixo capta variações mais específicas relacionadas ao envelhecimento populacional.
 
 ## Questão 6.6 Artes e Barroso
 
