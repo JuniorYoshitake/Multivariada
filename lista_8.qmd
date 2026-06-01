@@ -1,0 +1,632 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+    fig-cap-location: top
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{Análise de Correspondências}}
+
+\vspace{2.5cm}
+
+{\large Carlos César Yoshitake}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Resolução da Lista 8 da disciplina Análise Multivariada.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\singlespacing
+
+# Questões
+
+## Questão 72
+
+\textbf{Pesquise sobre o pacote ca do R. Descreva os objetos da função ca (listados abaixo) e
+a relação com os resultados matriciais apresentados em sala. Reproduza estes objetos
+matricialmente.}
+
+Objetos da função ca: sv, rowmass, rowdist, rowinertia, rowcoord, colmass, coldist,
+colinertia, colcoord, N.
+
+```{r}
+#| message: false
+#| warning: false
+#| include: false
+library(ca)
+
+```
+
+\bigskip
+
+- SV (Singular Values)}
+
+\textbf{Descrição:} valores singulares obtidos a partir da decomposição em valores singulares da matriz padronizada da Análise de Correspondência. Seus quadrados correspondem aos autovalores da análise e representam a inércia explicada por cada dimensão.
+
+\textbf{Fórmulas:}
+
+$$
+\mathbf{S}
+=
+\mathbf{D}_r^{-1/2}
+(\mathbf{P}-\mathbf{r}\mathbf{c}')
+\mathbf{D}_c^{-1/2}
+$$
+
+$$
+\mathbf{S}
+=
+\mathbf{U}
+\mathbf{\Sigma}
+\mathbf{V}'
+$$
+
+Os elementos da diagonal de $\Sigma$ correspondem ao objeto \texttt{sv}.
+
+$$
+\lambda_k = \sigma_k^2
+$$
+
+\bigskip
+
+- Rowmass (Massa das linhas)
+
+\textbf{Descrição:} proporção de observações pertencentes a cada linha da tabela de contingência.
+
+\textbf{Fórmulas:}
+
+$$
+\mathbf{P}
+=
+\frac{\mathbf{N}}{n}
+$$
+$$
+\mathbf{r}
+=
+\mathbf{P}\mathbf{1}
+$$
+$$
+r_i = \sum_{j=1}^{J} p_{ij}
+$$
+
+\bigskip
+
+- Rowdist (Distâncias qui quadrado das Linhas)
+
+\textbf{Descrição:} distância qui-quadrado entre cada perfil de linha e o perfil médio das colunas
+
+\textbf{Fórmulas:}
+
+$$
+d_i^2
+=
+\sum_{j=1}^{J}
+\frac{\left(\frac{p_{ij}}{r_i}-c_j\right)^2}{c_j}
+$$
+
+\bigskip
+
+- Rowinertia (Inércia das Linhas)
+
+\textbf{Descrição:} contribuição absoluta de cada linha para a inércia total.
+
+\textbf{Fórmulas:}
+
+$$
+I_i
+=
+r_i d_i^2
+$$
+A inércia total é dada por:
+
+$$
+I
+=
+\sum_i r_i d_i^2
+$$
+\bigskip
+
+- Rowcoord (Coordenada das Linhas)
+
+\textbf{Descrição:} coordenadas fatoriais das categorias de linha nos eixos da análise.
+
+\textbf{Fórmulas:}
+
+$$
+\mathbf{F}
+=
+\mathbf{D}_r^{-1/2}
+\mathbf{U}
+\mathbf{\Sigma}
+$$
+Cada linha de $F$ representa a posição de uma categoria de linha no mapa perceptual.
+
+\bigskip
+
+- Colmass (Massas das Colunas)
+
+\textbf{Descrição:} proporção de observações pertencentes a cada coluna da tabela de contingência.
+
+\textbf{Fórmulas:}
+
+$$
+\mathbf{c}
+=
+\mathbf{P}'
+\mathbf{1}
+$$
+
+$$
+c_j
+=
+\sum_{i=1}^{I} p_{ij}
+$$
+
+\bigskip
+
+- Coldist (Distâncias Qui-Quadrado das Colunas)
+
+\textbf{Descrição:} distância qui-quadrado entre cada perfil de coluna e o perfil médio das linhas.
+
+\textbf{Fórmulas:}
+
+$$
+d_j^2
+=
+\sum_{i=1}^{I}
+\frac{\left(\frac{p_{ij}}{c_j}-r_i\right)^2}{r_i}
+$$
+
+\bigskip
+
+- Colinertia (Inércia das Colunas)
+
+\textbf{Descrição:} contribuição absoluta de cada coluna para a inércia total.
+
+\textbf{Fórmulas:} 
+
+$$
+I_j
+=
+c_j d_j^2
+$$
+A inércia total também pode ser escrita como:
+
+$$
+I
+=
+\sum_j c_j d_j^2
+$$
+
+\bigskip
+
+- Colcood (Coordenadas das Colunas)
+
+\textbf{Descrição:} coordenadas fatoriais das categorias de coluna nos eixos da análise.
+
+\textbf{Fórmulas:}
+
+$$
+\mathbf{G}
+=
+\mathbf{D}_c^{-1/2}
+\mathbf{V}
+\mathbf{\Sigma}
+$$
+
+\bigskip
+
+- N (Tabela de Frequências)
+
+\textbf{Descrição:} matriz de contingência original utilizada como entrada da Análise de Correspondência.
+
+\textbf{Fórmulas:}
+
+$$
+\mathbf{N}
+=
+\begin{bmatrix}
+n_{11} & n_{12} & \cdots & n_{1J}\\
+n_{21} & n_{22} & \cdots & n_{2J}\\
+\vdots & \vdots & \ddots & \vdots\\
+n_{I1} & n_{I2} & \cdots & n_{IJ}
+\end{bmatrix}
+$$
+
+onde $n_{ij}$ representa a frequência observada na célula $(i,j)$.
+
+Em R:
+
+```{r}
+#| eval: false
+
+A <- ca(N)
+
+P <- A$N / sum(A$N)
+
+r <- rowSums(P)
+c <- colSums(P)
+
+Dr <- diag(r)
+Dc <- diag(c)
+
+S <- solve(sqrt(Dr)) %*%
+     (P - r %*% t(c)) %*%
+     solve(sqrt(Dc))
+
+svdS <- svd(S)
+
+sv <- svdS$d
+
+rowcoord <- solve(sqrt(Dr)) %*%
+            svdS$u %*%
+            diag(sv)
+
+colcoord <- solve(sqrt(Dc)) %*%
+            svdS$v %*%
+            diag(sv)
+
+rowdist <- sqrt(rowSums((rowcoord^2)))
+
+coldist <- sqrt(colSums(t(colcoord)^2))
+
+rowinertia <- r * rowdist^2
+
+colinertia <- c * coldist^2
+```
+
+\newpage
+
+## Questão 73
+
+\textbf{O pacote vcd do R possui dados sobre sobre suicídio na Alemanha Ocidental obtidos de
+Heuer, J., 1979 (Suicide by children and youth). O arquivo possui 306 observações e 6
+variáveis:}
+
+- Freq: número de casos.
+- sex: sexo masculino (male) e feminino (female)
+- method: método de suicídio - poison (envenenamento), toxic gas (gás tóxico),
+cooking gas (gás de cozinha), hang (enforcamento), drown (afogamento), gun (arma
+de fogo), knife (faca), jump (pulo) e other (outros).
+- age: idade.
+- age.group: faixa etária.
+- method2: método de suícidio. Igual a method, mas com as categorias toxic gas e
+cooking gas unidas como gas. Observação: neste caso você tem uma tabela com
+três variáveis, i.e., (sexo, método, grupo de idade).
+
+Realize uma análise de correspodências com as variáveis method e age.group.
+
+\vspace{0.5cm}
+
+\textbf{a) Indique cada etapa de seu estudo e respectivas conclusões.}
+
+\vspace{0.5cm}
+
+1 - Etapa: Carregar os dados e preparar a tabela de contingência
+
+```{r}
+#| echo: false
+#| tbl-cap: "Tabela de contingência entre método e faixa etária"
+
+library(vcd)
+library(knitr)
+library(kableExtra)
+
+data("Suicide")
+
+dados <- as.data.frame(Suicide)
+
+tabela_contingencia <- xtabs(Freq ~ method + age.group, data = dados)
+
+kbl(
+  as.matrix(tabela_contingencia),
+  format = "latex",
+  booktabs = TRUE,
+  align = "c"
+) |>
+  kable_styling(
+    latex_options = c("hold_position")
+  )
+
+```
+
+2 - Etapa: Verificação de Fatorabilidade
+
+Teste Qui-Quadrado sob as seguintes hipóteses:
+
+\vspace{0.5cm}
+
+$H_0)$: As variáveis são independentes (não há associação)
+
+$H_1)$: Existe associação
+
+\vspace{0.5cm}
+
+```{r}
+#| echo: false
+#| tbl-cap: "Teste Qui-Quadrado - Dados VCD"
+
+teste_chi2 <- chisq.test(tabela_contingencia)
+
+resultado_chi2 <- data.frame(
+  Estatística = round(teste_chi2$statistic, 3),
+  GL = teste_chi2$parameter,
+  `Valor-p` = format.pval(teste_chi2$p.value, digits = 4)
+)
+
+kbl(
+  resultado_chi2,
+  format = "latex",
+  booktabs = TRUE
+) |>
+  kable_styling(
+    latex_options = "hold_position"
+  )
+```
+
+Dado o $p-valor$ de `r teste_chi2$p.value` (muito menor que 0.05), a hipótese nula é rejeitada. Logo,
+estatisticamente a escolha do método de suicídio está relacionado com a idade da pessoa.
+
+3 - Execução da análise de correspondências (AC)
+
+```{r}
+
+resultado_ca <- ca(tabela_contingencia)
+
+summary(resultado_ca)
+
+```
+
+\vspace{0.5cm}
+
+Como é possível observar pela saída da função \texttt{ca()}, a inércia total de $0.065101$ confirma a existência de uma estrutura de dados "não aleatória" a ser explorada. Sem inércia (ou com inércia próxima de zero), os perfis seriam homogêneos, o teste Qui-Quadrado não seria significativo e os pontos estariam todos sobrepostos na origem do gráfico, tornando a análise inútil
+
+A primeira dimensão explica, sozinha, 93.47% da inércia total. Portanto, o mapa bidimensional será adequado, uma vez que, usando duas dimensões, a perda de informação é de apenas 3.1%.
+
+4 - Interpretação da análise
+
+\textbf{b) Calcule e interprete a estatística Qui-Quadrado e a Inércia Total.}
+
+\vspace{0.5cm}
+
+O teste Qui-Quadrado apresentou um p-valor extremamente baixo ($p<0.001$), permitindo rejeitar a hipótese de independência e confirmar uma associação estatisticamente significativa entre método de suicídio e faixa etária. A Inércia Total de $0.065101$ quantifica essa associação global, fornecendo a base necessária para a decomposição em dimensões e a construção do mapa perceptual.
+
+\vspace{0.5cm}
+
+\textbf{c) Análise os resíduos em cada célula da tabela e interprete os resultados.}
+
+\vspace{0.5cm}
+
+```{r}
+#| echo: false
+#| tbl-cap: Resíduos de Pearson
+#| label: tbl-pearson
+
+residuos <- (teste_chi2$observed - teste_chi2$expected) /
+            sqrt(teste_chi2$expected)
+
+kbl(
+  round(teste_chi2$residuals, 2),
+  format = "latex",
+  booktabs = TRUE
+) |>
+  kable_styling(
+    font_size = 8,
+    latex_options = "hold_position"
+  )
+```
+
+Análise por faixa:
+
+- 10-20 anos: apresenta associação negativa aos métodos de afogamento e enforcamento, positiva e predominante para "Outros" e armas, seguida de gás tóxico, envenenamento e gás de cozinha;
+- 25-35 anos: associação positiva para gás tóxico, "Outros", envenenamento, armas, gás de cozinha, e, próximo de 0, pular. Associação negativa para enforcamento, sendo a maior da tabela, seguida de afogamento e facas;
+- 40-50 anos: apresenta associação positiva para gás tóxico e armas, seguida de facas, envenenamento e enforcamento (quase nula). Apresenta associação negativa predominante para pular, seguida de afogamento e gás de cozinha;
+- 55-65 anos: associação positiva para enforcamento e afogamento, seguido de pulo e facas; associação negativa para gás tóxico, armas e "Outros", seguida de envenenamento, e gás de cozinha;
+- 70-90 anos: associação positiva e predominante para enforcamento, afogamento, pular e facas; associação negativa extrema para gás tóxico, armas, "Outros" e envenenamento.
+
+\textbf{Principais Associações Positivas:}
+
+- Gás Tóxico e Jovens Adultos (25-35 anos): O resíduo de 19.51 é o mais alto da tabela, indicando uma concentração massiva deste método nesta faixa etária específica.
+- Enforcamento e Idosos (70-90 anos): Com um resíduo de 15.36, há uma forte associação entre idades avançadas e o método de enforcamento.
+- Armas de Fogo e Jovens (10-20 anos): O valor de 10.81 mostra que este método é característico dos grupos mais jovens na amostra alemã.
+- Outros Métodos e Jovens (10-35 anos): Resíduos acima de 11 indicam que métodos não classificados nos tradicionais são prevalentes em indivíduos mais novos.
+
+\textbf{Principais Associações Negativas:}
+
+- Enforcamento e Jovens Adultos (25-35 anos): O resíduo de -18.49 é uma repulsão fortíssima. Embora o enforcamento seja comum no geral, este grupo de idade o utiliza muito menos do que a média da população.
+- Gás Tóxico e Idosos (55-90 anos): Resíduos de -13.33 e -16.87 indicam que o uso de gás tóxico é extremamente raro entre os mais velhos.
+- Afogamento e Jovens (10-20 anos): O valor de -11.23 mostra que este método é significativamente menos frequente na juventude.
+
+A análise dos resíduos de Pearson confirma que a escolha do método de suicídio é fortemente condicionada pela idade. Destaca-se a atração extrema entre o grupo de 25-35 anos e o uso de gás tóxico ($ϵ=19.51$), enquanto o enforcamento mostra uma transição clara: é fortemente rejeitado pelos jovens adultos ($ϵ=−18.49$) e predominante entre os idosos acima de 70 anos ($ϵ=15.36$). Esses desvios da independência são os elementos que estruturam as dimensões da análise e posicionarão esses grupos em extremidades opostas no mapa de correspondências.
+
+\vspace{0.5cm}
+
+\textbf{d) Apresente um mapa de correspondências e faça um breve resumo dos resultados gerais
+da análise.}
+
+\vspace{0.5cm}
+
+```{r}
+#| echo: false
+#| fig-cap: "Mapa de Correspondências: Método vs Faixa Etária"
+#| fig-width: 7
+#| fig-height: 5
+#| label: fig-mpca
+
+plot(resultado_ca, main = "Mapa de Correspondências: Método vs Faixa Etária")
+```
+
+Os Resíduos de Pearson da tabela @tbl-pearson e o gráfico @fig-mpca denotam a mesma informação, existe uma forte associação entre o método de suicídio e a faixa etária, sendo a primeira dimensão responsável por 93.47% da inércia total. Portanto, a maior parte da estrutura dos dados pode ser interpretada ao longo do eixo horizontal do @fig-mpca.
+
+Os resíduos mostram que os métodos mais associados aos jovens são:
+
+- gás tóxico (19.51 para 25–35 anos e 6.31 para 10–20 anos);
+- "Outros" (11.06 e 11.01);
+- armas (8.15 e 10.81);
+- envenenamento (8.75 e 4.03);
+- gás de cozinha (3.47 e 3.35).
+
+Esses métodos aparecem no lado esquerdo do mapa, próximos das faixas etárias 10–20 e 25–35.
+
+Por outro lado, os métodos mais associados aos idosos são:
+
+- enforcamento (15.36 para 70–90 anos e 11.31 para 55–65 anos);
+- afogamento (12.84 para 70–90 anos e 10.42 para 55–65 anos);
+- pular (8.04 para 70–90 anos).
+
+\textbf{Conclusão:}
+
+A análise evidencia que o método de suicídio utilizado varia substancialmente conforme a faixa etária. Indivíduos jovens apresentam associação com envenenamento, gases tóxicos, armas de fogo e outros métodos, enquanto indivíduos mais velhos estão mais associados ao enforcamento, afogamento e pular. Como a primeira dimensão explica 93,5% da inércia, essa oposição entre jovens e idosos constitui a principal estrutura presente nos dados.
