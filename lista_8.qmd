@@ -630,3 +630,512 @@ Por outro lado, os métodos mais associados aos idosos são:
 \textbf{Conclusão:}
 
 A análise evidencia que o método de suicídio utilizado varia substancialmente conforme a faixa etária. Indivíduos jovens apresentam associação com envenenamento, gases tóxicos, armas de fogo e outros métodos, enquanto indivíduos mais velhos estão mais associados ao enforcamento, afogamento e pular. Como a primeira dimensão explica 93,5% da inércia, essa oposição entre jovens e idosos constitui a principal estrutura presente nos dados.
+
+## Questão 6.1 Artes e Barroso
+
+Dados: Covid19SP.xlsx
+
+\begin{table}[H]
+\centering
+\caption{Variáveis disponíveis para municípios de São Paulo}
+\label{tab:municipios_sp}
+\begin{tabular}{p{3cm} p{11cm}}
+\toprule
+\textbf{Variável} & \textbf{Descrição} \\
+\midrule
+Código      & Código do município (codificação própria) \\
+Município   & Nome do município \\
+GrupoPop    & Grupo por faixa da população (P1 a P4) \\
+Casos       & Casos de Covid-19 notificados até 18/06/2021 \\
+Óbitos      & Óbitos por Covid-19 notificados até 18/06/2021 \\
+População   & População estimada em 2021 \\
+IDHM        & Índice de Desenvolvimento Humano Municipal em 2010 \\
+IDHR        & Índice de Desenvolvimento Humano Renda em 2010 \\
+IDHL        & Índice de Desenvolvimento Humano Longevidade em 2010 \\
+IDHE        & Índice de Desenvolvimento Humano Educação em 2010 \\
+Prevalência & Casos de Covid-19 por 1.000 habitantes até 18/06/2021 \\
+Mortalidade & Óbitos por Covid-19 por 10.000 habitantes até 18/06/2021 \\
+Letalidade  & Óbitos por Covid-19 por 100 casos até 18/06/2021 \\
+HabDom      & Número médio de habitantes por domicílio \\
+GrauUrb     & Grau de urbanização, em porcentagem \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{a) Categorize as variáveis Prevalência, Mortalidade e Letalidade com base em seus quartis.
+}
+
+Por meio da função \texttt{quantile()} as variáveis em questão foram categorizadas da seguinte maneira:
+
+- Baixa: Valores entre o Mínimo e Q1.
+- Média-Baixa: Valores entre Q1 e Q2.
+- Média-Alta: Valores entre Q2 e Q3.
+- Alta: Valores entre Q3 e o Máximo.
+
+
+```{r}
+#| message: false
+#| warning: false
+
+library(readxl)
+
+dados <- read_xlsx(path = "COVID19SP\\COVID19SP.xlsx")
+
+dados$Prevalencia_cat <- cut(dados$Prevalência, 
+                             breaks = quantile(dados$Prevalência, 
+                                               probs = seq(0, 1, 0.25), 
+                                               na.rm = TRUE),
+                             labels = c("Baixa", "Média-Baixa", 
+                                        "Média-Alta", "Alta"),
+                             include.lowest = TRUE)
+dados$Mortalidade_cat <- cut(dados$Mortalidade, 
+                             breaks = quantile(dados$Mortalidade, 
+                                               probs = seq(0, 1, 0.25), 
+                                               na.rm = TRUE),
+                             labels = c("Baixa", "Média-Baixa", 
+                                        "Média-Alta", "Alta"),
+                             include.lowest = TRUE)
+dados$Letalidade_cat <- cut(dados$Letalidade, 
+                             breaks = quantile(dados$Letalidade, 
+                                               probs = seq(0, 1, 0.25), 
+                                               na.rm = TRUE),
+                             labels = c("Baixa", "Média-Baixa", 
+                                        "Média-Alta", "Alta"),
+                             include.lowest = TRUE)
+```
+
+\textbf{b) Faça os mapas da análise de correspondência simples de cada uma das variáveis categorizadas no item a) versus a variável GrupoPop. Interprete os resultados.}
+
+Prevalência X GrupoPop
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-cap: "Mapa de Correspondências: Prevalência vs Faixa GrupoPop"
+#| fig-width: 7
+#| fig-height: 5
+#| label: fig-caprepop
+
+N1 <- table(dados$Prevalencia_cat, dados$GrupoPop)
+
+res1 <- ca(N1)
+
+plot(res1)
+
+```
+Lembrando que  a variável $Prevalência$ é "Casos de Covid-19 por 1.000 Habitantes". 
+A partir da figura @fig-caprepop, é possível notar que a Dimensão 1 explica 75.8% da inércia, ou seja, ela é a principal responsável pela associação.
+
+O grupo P2 apresentou associação com as categorias intermediárias de prevalência (Média-Baixa e Média-Alta), enquanto P1 esteve mais associado à categoria Baixa e P4 à categoria Alta. O grupo P3 apresentou associação moderada com a categoria Média-Alta. As associações observadas foram moderadas, uma vez que os resíduos padronizados não ultrapassaram o valor absoluto de 2.
+
+
+Mortalidade X GrupoPop
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-cap: "Mapa de Correspondências: Mortalidade vs Faixa GrupoPop"
+#| fig-width: 7
+#| fig-height: 5
+#| label: fig-camortpop
+
+
+N2 <- table(dados$Mortalidade_cat, dados$GrupoPop)
+
+res2 <- ca(N2)
+
+plot(res2)
+
+```
+Lembrando que  a variável $Mortalidade$ é "Casos de Covid-19 por 10.000 Habitantes". 
+
+A partir da figura @fig-camortpop, é possível notar que a Dimensão 1 explica 78.3% da inércia, ou seja, ela é a principal responsável pela associação.
+
+O grupo P4 esteve associado à categoria Baixa, enquanto P2 apresentou associação com a categoria Média-Alta. O grupo P1 mostrou comportamento oposto à categoria Baixa, indicando tendência a mortalidades mais elevadas, ao passo que P3 apresentou associação moderada com as categorias Baixa e Média-Baixa. Algumas associações foram relativamente fortes, com resíduos padronizados superiores a 2 em valor absoluto.
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-cap: "Mapa de Correspondências: Letalidade vs Faixa GrupoPop"
+#| fig-width: 7
+#| fig-height: 5
+#| label: fig-caletapop
+
+N3 <- table(dados$Letalidade_cat, dados$GrupoPop)
+
+res3 <- ca(N3)
+
+plot(res3)
+
+```
+
+A partir da figura @fig-caletapop, é possível notar que a Dimensão 1 explica 62.6% da inércia total, ou seja, ela é a principal responsável pela associação.
+
+O grupo P1 apresentou associação com as categorias Média-Alta e Alta, enquanto P2 esteve associado à categoria Média-Baixa. O grupo P4 mostrou associação com a categoria Baixa, ao passo que P3 apresentou associação com as categorias Baixa e Média-Baixa e associação negativa com a categoria Alta. As associações observadas foram relativamente fortes, uma vez que diversos resíduos padronizados ultrapassaram o valor absoluto de 2.
+
+\textbf{c) Faça a análise de correspondência múltipla das quatro variáveis consideradas no item b).}
+
+```{r}
+#| fig-cap: "Mapa de Correspondências: Múltipla GrupoPop - Prev, Mort, Letal"
+#| fig-width: 7
+#| fig-height: 7
+#| label: fig-acmpop
+#| message: false
+#| warning: false
+
+
+library(dplyr)
+
+dados_acm <- dados %>% select(GrupoPop, Prevalencia_cat, Mortalidade_cat, Letalidade_cat)
+
+resultado_acm <- mjca(dados_acm)
+
+plot(resultado_acm)
+```
+
+\textbf{d) Compare as análises feitas nos itens b) e c)}
+
+## Questão 6.2 Artes e Barroso
+
+\begin{table}[H]
+\centering
+\caption{Características de mochilas e de escoliose}
+\label{tab:mochilas}
+\begin{tabular}{p{3cm} p{10cm}}
+\hline
+\textbf{Variável} & \textbf{Descrição} \\
+\hline
+Sexo &
+Sexo da criança -- M: masculino, F: feminino \\
+
+Peso &
+Peso da criança em quilogramas \\
+
+Altura &
+Altura da criança em metros \\
+
+TipoMochila &
+Tipo da mochila -- E: escapular, L: lateral, C: carrinho \\
+
+ModoCarregar &
+Modo de carregar a mochila -- 1: dois ombros, 2: um ombro,
+3: no tronco, 4: mão direita, 5: mão esquerda, 6: outros \\
+
+Escoliose &
+Lado da escoliose -- D: direito, E: esquerdo, A: ausente \\
+\hline
+\end{tabular}
+\end{table}
+
+\textbf{a) Faça uma análise de correspondência simples considerando as variáveis Tipo-Mochila e Escoliose. Comente.
+}
+
+```{r}
+#| message: false
+#| warning: false
+#| fig-cap: "Mapa de Correspondências: Tipo Mochila X Escoliose"
+#| fig-width: 7
+#| fig-height: 5
+#| label: fig-typeturn
+
+
+dados <- read_xlsx(path = "MOCHILA\\MOCHILA.xlsx")
+
+dados$TipoMochila_cat <- c(
+  "E" = "Escapular",
+  "L" = "Lateral",
+  "C" = "Carrinho"
+)[dados$TipoMochila]
+
+dados$Escoliose_cat <- c(
+  "D" = "Direito",
+  "E" = "Esquerdo",
+  "A" = "Ausente"
+)[dados$Escoliose]
+
+N <- table(dados$TipoMochila_cat, dados$Escoliose_cat)
+
+resultado <- ca(N)
+
+plot(resultado)
+
+```
+Observa-se na figura @fig-typeturn, que mochilas de carrinho estão associadas a escoliose-direita, enquanto lateral parece distante sem associações claras. Já as mochilas escapulares estão associadas a escoliose-esquerda e à ausência de escoliose. Ademais, é possível observar também que a Dimensão 1 explica 99.1% da inércia total
+
+\textbf{b) Agrupe as categorias da variável ModoCarregar em três categorias (1: nos dois ombros + no tronco, 2: em um ombro + na mão direita + na mão esquerda, 3: outros) e com elas faça uma análise de correspondência simples versus Escoliose. Comente.
+}
+
+```{r}
+#| message: false
+#| warning: false
+#| fig-cap: "Mapa de Correspondências: ModoCarregar X Escoliose"
+#| fig-width: 7
+#| fig-height: 5
+#| label: fig-typecarryturn
+
+dados <- dados %>%
+  mutate(
+    ModoCarry = case_when(
+      ModoCarregar == 1 ~ "nos dois ombros + no tronco",
+      ModoCarregar == 2 ~ "em um ombro + na mão direita + na mão esquerda",
+      TRUE ~ "outros"
+    )
+  )
+
+Ncarry <- table(dados$ModoCarry, dados$Escoliose_cat)
+
+res_carry <- ca(Ncarry)
+
+plot(res_carry)
+
+```
+Como é possível notar na Figura @fig-typecarryturn, os modos de carregar a mochila nos dois ombros e no tronco estão associados à escoliose do lado esquerdo, enquanto a categoria Outros apresenta associação com a escoliose do lado direito. Por outro lado, os modos de carregar em um ombro, na mão direita e na mão esquerda, bem como a ausência de escoliose, não apresentaram associações específicas tão evidentes. Além disso, essas categorias encontram-se relativamente afastadas da origem, indicando perfis distintos em relação ao perfil médio observado na tabela. Ademais, nota-se que a Dimensão 1 explica 89.9% da inércia total.
+
+\textbf{c) Faça uma análise de correspondência para avaliar Escoliose versus TipoMochila e ModoCarregar, usando tabelas combinadas.}
+
+```{r}
+#| message: false
+#| warning: false
+#| fig-cap: "Mapa de Correspondências: Escoliose X Tipo Mochila e ModoCarregar - Combinadas"
+#| fig-width: 7
+#| fig-height: 5
+#| label: fig-turntypemode
+
+tab1 <- table(dados$TipoMochila_cat, dados$Escoliose_cat)
+
+tab2 <- table(dados$ModoCarry, dados$Escoliose_cat)
+
+tab_comb <- rbind(tab1, tab2)
+
+res_comb <- ca(tab_comb)
+
+plot(res_comb)
+
+```
+Novamente, na Figura @fig-turntypemode, os modos de carregar a mochila em um ombro, na mão direita e na mão esquerda encontram-se relativamente afastados da origem, indicando perfis distintos em relação ao perfil médio observado na tabela. Em contraste, a ausência de escoliose apresenta associação com o tipo de mochila escapular. Além disso, a escoliose do lado direito encontra-se associada aos tipos de mochila lateral, carrinho e outros, enquanto a escoliose do lado esquerdo está associada ao transporte da mochila nos dois ombros e no tronco, bem como ao uso de mochilas escapulares. Por fim, a Dimensão 1 explica 93,2% da inércia total, indicando que a maior parte da estrutura de associação observada é representada ao longo desse eixo.
+
+\textbf{d) Faça uma análise de correspondência para avaliar Escoliose versus TipoMochila e ModoCarregar, usando tabelas justapostas.
+}
+
+```{r}
+#| message: false
+#| warning: false
+#| fig-cap: "Mapa de Correspondências: Escoliose X Tipo Mochila e ModoCarregar - Justapostas"
+#| fig-width: 7
+#| fig-height: 5
+#| label: fig-turntypemodejust
+
+colnames(tab1) <- paste0(colnames(tab1), "_Tipo")
+
+colnames(tab2) <- paste0(colnames(tab2), "_Modo")
+
+tab_just <- cbind(tab1, tab2)
+
+res_just <- ca(tab_just)
+
+plot(res_just)
+
+```
+O gráfico da figura @fig-turntypemodejust apresenta que o tipo de mochila carrinho está associado com escoliose direita, enquanto tipo mochila lateral está associada com escoliose direita e modo de carregar. Os outros pontos estão distantes entre si de maneira que nenhuma associação está clara.
+
+\textbf{e) Compare todas as análises feitas.}
+
+As análises de correspondência indicam uma estrutura de associação consistente entre escoliose e padrões de uso de mochila. Observa-se que a associação mais robusta e estável ao longo de todas as abordagens refere-se ao uso de mochilas tipo carrinho, associado à escoliose direita, e ao uso de dois ombros/tronco, associado à escoliose esquerda. Entretanto, categorias com menor frequência ou maior granularidade (como “lateral”, “escapular” e “outros”) apresentam instabilidade de posicionamento nos mapas fatoriais, o que é esperado devido à baixa contribuição relativa dessas categorias na inércia total e à sensibilidade da análise ao nível de agregação das variáveis. Adicionalmente, observa-se que as análises com variáveis combinadas tendem a concentrar maior proporção da inércia na primeira dimensão, refletindo uma estrutura mais unidimensional das associações.
+
+## Questão 6.3 Artes e Barroso
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+library(knitr)
+
+tab <- data.frame(
+  `Olhos/Cabelos` = c("Verde", "Azul", "Castanho", "Preto", "Total"),
+  Loiro = c(688, 326, 343, 98, 1455),
+  Vermelho = c(116, 38, 84, 48, 286),
+  `Castanho-claro` = c(584, 241, 909, 403, 2137),
+  `Castanho-escuro` = c(188, 110, 412, 681, 1391),
+  Preto = c(4, 3, 26, 85, 118),
+  Total = c(1580, 718, 1774, 1315, 5387)
+)
+
+kable(
+  tab,
+  caption = "Tabela de contingência: cor dos olhos versus cor dos cabelos",
+  booktabs = TRUE,
+  align = c("l", rep("r", 6))
+)
+```
+
+
+\textbf{a) Faça os mapas da análise de correspondência simples de cor dos olhos versus cor dos cabelos em duas dimensões. Interprete os resultados.}
+
+```{r}
+#| message: false
+#| warning: false
+#| echo: false
+#| fig-cap: "Mapa de Correspondências: Cor dos olhos X Cor dos cabelos"
+#| fig-width: 7
+#| fig-height: 5
+#| label: fig-caolhoscabelo
+
+tab_ca <- matrix(
+  c(
+    688,116,584,188,4,
+    326,38,241,110,3,
+    343,84,909,412,26,
+    98,48,403,681,85
+  ),
+  nrow = 4,
+  byrow = TRUE,
+  dimnames = list(
+    c("Verde", "Azul", "Castanho", "Preto"),
+    c("Loiro", "Vermelho", "Castanho-claro",
+      "Castanho-escuro", "Preto")
+  )
+)
+
+res_olhoxcabelo <- ca(tab_ca)
+
+plot(res_olhoxcabelo)
+
+```
+Como é possível observar na figura @fig-caolhoscabelo, olhos Pretos possuem associação com cabelos Castanho-Escuro e Pretos, olhos Castanhos com cabelos Castanho-claro, e olhos Azuis e Verdes com cabelos Vermelhos e Loiros. 
+
+\textbf{b) Qual é a porcentagem da inércia principal explicada por cada um dos eixos?
+}
+
+Como observado na figura @fig-caolhoscabelo, a dimensão 1, eixo x, explica 86.6% da inércia total, já a dimensão 2, 13.1%
+
+\textbf{c) Qual é a qualidade da representação de cada categoria de cor de olhos e de cor dos cabelos?
+}
+
+```{r}
+summary(res_olhoxcabelo)
+```
+
+Através da função \texttt{summary()}, observou-se que as categorias de cor dos olhos apresentaram excelente qualidade de representação nas duas primeiras dimensões, com valores superiores a 0,97. Para a cor dos cabelos, as categorias Loiro, Castanho-claro, Castanho-escuro e Preto também apresentaram excelente representação, com qualidade próxima de 1,00, enquanto a categoria Vermelho apresentou qualidade ligeiramente inferior (0,803), embora ainda satisfatória. Dessa forma, o plano bidimensional representa adequadamente as associações entre as categorias analisadas, uma vez que as duas primeiras dimensões explicam aproximadamente 99,7% da inércia total.
+
+\textbf{d) Qual é a cor de olhos e cor dos cabelos que mais explicam as inércias dos eixos do mapa? De quanto?
+}
+
+Na primeira dimensão, a categoria de cor dos olhos que mais contribuiu para a formação do eixo foi Preto (60,5%), enquanto, para a cor dos cabelos, a maior contribuição foi da categoria Castanho-escuro (44,9%). Na segunda dimensão, a categoria Castanho foi a principal responsável pela inércia entre as cores dos olhos (65,7%), ao passo que a categoria Castanho-claro apresentou a maior contribuição entre as cores dos cabelos (57,2%).
+
+\textbf{e) Qual é a contribuição dos eixos para cada categoria de cor de olhos? E de cor dos cabelos?}
+
+A primeira dimensão explicou a maior parte da variabilidade das categorias Verde (95,6%), Azul (83,6%) e Preto (96,5%) da cor dos olhos, bem como das categorias Loiro (90,7%), Vermelho (77,0%), Castanho-escuro (96,9%) e Preto (93,4%) da cor dos cabelos. Por outro lado, a categoria Castanho dos olhos (98,1%) e a categoria Castanho-claro dos cabelos (96,1%) foram explicadas predominantemente pela segunda dimensão.
+
+## Questão 6.4 Artes e Barroso
+
+\textbf{a) Faça os mapas da análise de correspondência simples do “Motivo do crédito” (X4) versus “Sexo” e “Estado civil” (X9). Interprete os resultados.
+}
+
+```{r}
+#| fig-cap: "Mapa de correspondências - Motivo do crédito X Sexo e estado Civil"
+#| label: fig-credsex
+#| fig-width: 6
+#| fig-height: 6
+
+
+dados <- read_xlsx(path = "BancoAlemao\\BancoAlemao.xlsx")
+
+dados$X9_cat <- c(
+  NA,
+  "M-divorciado/separado",
+  "F-divorciada/separada/casada",
+  "M-solteiro",
+  "M-casado/viúvo",
+  "F-solteira"
+)[dados$X9 + 1]
+
+dados$X4_cat <- c(
+  "Carro zero",
+  "Carro usado",
+  "Móvel",
+  "Rádio/TV",
+  "Aparelhos domésticos",
+  "Reparos",
+  "Educação",
+  "Viagem/Férias",
+  "Cursos",
+  "Negócios",
+  "Outros"
+)[dados$X4 + 1]
+
+N64 <- table(dados$X4_cat, dados$X9_cat)
+
+res_64 <- ca(N64)
+
+plot(res_64)
+
+```
+Observa-se na figura @fig-credsex que a Dimensão 1 explica 50.8% da inércia total, e a Dimensão 2, 30.8%.
+Ademais, é possível notar que Homens solteiros possuem associação com Reparos, Carro usado, Carro zero, Négocios, enquanto Homens divorciados/separados possuem associação com Outros. Mulheres divorciadas/separadas/casadas possuem mais associação com Educação, Aparelhos Domésticos,Móveis. Por fim, o homem casado/víuvo tem mais associação com Radio/tv e Cursos.
+
+\textbf{b) Faça os mapas da análise de correspondência simples do “Motivo do crédito” (X4) versus “Ocupação” (X17). Interprete os resultados.}
+
+X17 tem valores únicos de 1,2,3,4, que não batem com o dicionário do livro. Assumirei que o valor 5 do dicionário é o 4 do banco de dados.
+
+```{r}
+#| fig-cap: "Mapa de correspondências - Motivo do crédito X Ocupação"
+#| label: fig-credocu
+#| fig-width: 6
+#| fig-height: 6
+
+
+dados$X17_cat <- c(
+  "1" = "Desempregado/não qualificado/não residente",
+  "2" = "Não qualificado/residente",
+  "3" = "Qualificado",
+  "4" = "Gestor/autônomo/altamente qualificado"
+)[as.character(dados$X17)]
+
+N64_b <- table(dados$X4_cat, dados$X17_cat)
+
+res_64_b <- ca(N64_b)
+
+plot(res_64_b)
+
+```
+Observa-se na figura @fig-credocu que a Dimensão 1 explica 65.7% da inércia total, e a Dimensão 2, 26.2%. Além disso, é possível notar que Gestores/autônomos/altamente qualificados são associados à Carros usados, Educação, Negócios, Móveis, Rádios/TV, Carro zero, de maneira muito similar, com exceção de Carro usado, com os Qualificados. Os Não qualificados/residentes são associados a Carro zero, Cursos, Reparos e Aparelhos domésticos, e os Desempregados/não qualificados/não responderam estão um pouco distantes na dimensão 2 do restante das ocupações, porém estão em posição semelhante à Qualificados na Dimensão 1.
+
+\textbf{c) Faça a análise de correspondência para tabelas justapostas considerando “Motivo do crédito” (X4) versus “Sexo” e “Estado civil” (X9) e “Ocupação” (X17).
+}
+```{r}
+#| fig-cap: "Mapa de correspondências - Motivo do crédito X Ocupação X Sexo"
+#| label: fig-cajusta64
+#| fig-width: 6
+#| fig-height: 6
+tab_64just <- cbind(N64, N64_b)
+
+res_64just <- ca(tab_64just)
+
+plot(res_64just)
+
+```
+A análise de correspondência para tabelas justapostas apresentada na Figura @fig-cajusta64 indicou que a Dimensão 1 explicou 49,2% da inércia total, enquanto a Dimensão 2 explicou 19,9%. De modo geral, as categorias encontram-se próximas da origem do mapa perceptual, sugerindo perfis semelhantes e associações pouco pronunciadas entre as variáveis analisadas. Dessa forma, a interpretação deve concentrar-se nas categorias mais distantes da origem. As categorias Desempregado/não qualificado/não residente, Homens casados/viúvos, Cursos e Outros apresentaram maior afastamento em relação ao centro do gráfico, indicando perfis mais distintos da média e maior contribuição para a estrutura de associação observada.
+
+
+\textbf{d) Compare as análises feitas nos itens a), b) e c). }
+
+As análises dos itens a), b) e c) forneceram perspectivas complementares sobre a associação entre os motivos do crédito e as variáveis socioeconômicas. Na análise envolvendo sexo e estado civil, observou-se uma diferenciação mais clara entre os grupos, com associações específicas entre determinadas categorias e os motivos do crédito. Na análise envolvendo ocupação, as associações mostraram-se mais estruturadas, destacando a proximidade entre ocupações qualificadas e diversos tipos de crédito, enquanto os desempregados apresentaram perfil distinto em relação às demais categorias.
+
+Por sua vez, a análise de correspondência para tabelas justapostas permitiu avaliar simultaneamente as variáveis sexo/estado civil e ocupação em relação aos motivos do crédito. Entretanto, a maior concentração das categorias próximas à origem indicou perfis mais semelhantes e associações menos pronunciadas quando consideradas conjuntamente. Ainda assim, algumas categorias, como Desempregado/não qualificado/não residente, Homens casados/viúvos, Cursos e Outros, destacaram-se por apresentarem maior afastamento da origem, contribuindo mais para a estrutura de associação observada.
+
+Dessa forma, as análises separadas permitiram identificar associações específicas com maior clareza, enquanto a análise justaposta forneceu uma visão global das relações entre as variáveis, evidenciando os perfis mais distintos no conjunto dos dados
+
+## Questão 6.5 Artes e Barroso
+
+
+
+## Questão 6.6 Artes e Barroso
+
+## Questão 6.7 Artes e Barroso
+
+## Questão 6.8 Artes e Barroso
+
+## Questão 6.9 Artes e Barroso
