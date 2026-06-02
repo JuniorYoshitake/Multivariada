@@ -1,0 +1,323 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+    fig-cap-location: top
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{PROVA 2 QUESTÃO 81}}
+
+\vspace{2.5cm}
+
+{\large Carlos César Yoshitake}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Resolução Exercícios da P2 da disciplina Análise Multivariada.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\singlespacing
+
+# (81) Questão 6.8 Artes e Barroso
+
+\textbf{Construa a tabela justaposta reunindo as tabelas dos exercícios 6.5 e 6.7. Faça a análise de corresponência conjunta e compare com os resultados obtidos nos e exercícios anteriores.}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Tabela 6.45: Número de moradores versus região"
+
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(psych)
+library(ca)
+
+tab645 <- data.frame(
+  Moradores = c("1", "2", "3", "4", "5", "6 ou mais", "Total"),
+  Norte = c(627, 1105, 1269, 1119, 605, 561, 5286),
+  Nordeste = c(2592, 4475, 5015, 3699, 1681, 1054, 18516),
+  Sudeste = c(4918, 8301, 8228, 6067, 2144, 1082, 30740),
+  Sul = c(1680, 3089, 2975, 1933, 686, 305, 10668),
+  Centro_Oeste = c(772, 1447, 1409, 1120, 463, 223, 5434),
+  Total = c(10589, 18417, 18896, 13938, 5579, 3225, 70644)
+)
+
+tab645 |>
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    align = c("l", rep("c", 6)),
+    format.args = list(big.mark = ".")
+  ) |>
+  kable_styling(
+    latex_options = "HOLD_position"
+  )
+
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Tabela 6.46: Região versus raça"
+
+tab646 <- data.frame(
+  Regiao = c("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste", "Total"),
+  Branca = c(3279, 14190, 45438, 22813, 5746, 91466),
+  Preta = c(1388, 6572, 8580, 1321, 1437, 19298),
+  Parda = c(13640, 36323, 34642, 6041, 9256, 99902),
+  Total = c(18307, 57085, 88660, 30175, 16439, 210666)
+)
+
+tab646 |>
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    align = c("l", rep("c", 4)),
+    format.args = list(big.mark = ".")
+  ) |>
+  kable_styling(
+    latex_options = "HOLD_position"
+  )
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Mapa de Correspondências - moradores x regiao x cor/raça - justaposta"
+#| fig-height: 5
+#| fig-width: 6
+#| label: fig-justa
+#| fig-pos: H
+
+tab1 <- t(as.matrix(tab645[1:6, 2:6]))
+tab2 <- as.matrix(tab646[1:5, 2:4])
+
+tab_just <- cbind(tab1, tab2)
+
+res_just <- ca(tab_just)
+
+plot(res_just)
+```
+Observa-se, por meio da @fig-justa, uma estrutura de associação entre as regiões, as categorias de número de moradores por domicílio e as categorias de raça/cor, com predominância explicativa da primeira dimensão, responsável por 96,7% da inércia total. Nota-se que a região Sul apresenta forte proximidade com a categoria Branca, indicando uma associação expressiva entre essas categorias. Em posição intermediária, a região Sudeste encontra-se relativamente próxima das categorias de domicílios com 1, 2, 3 e 4 moradores, sugerindo um perfil mais associado a tamanhos domiciliares reduzidos ou próximos da média nacional.
+
+Por outro lado, as regiões Norte e Nordeste localizam-se no lado oposto do primeiro eixo, próximas das categorias Parda, Preta e dos domicílios com 5 e 6 ou mais moradores, evidenciando uma associação entre essas regiões, maiores tamanhos domiciliares e maior participação relativa dessas categorias raciais. Em particular, a região Norte apresenta maior proximidade com a categoria de 6 ou mais moradores, enquanto o Nordeste se associa mais fortemente à categoria Parda.
+
+A região Centro-Oeste encontra-se próxima da origem do plano fatorial, indicando um perfil mais semelhante ao perfil médio global e sem associações marcantes com categorias específicas. De modo semelhante, as categorias de 1 a 4 moradores também se posicionam próximas ao centro do mapa, sugerindo menor capacidade discriminatória no espaço bidimensional. A segunda dimensão, responsável por apenas 3,0% da inércia, contribui de forma complementar para a interpretação, destacando principalmente a diferenciação entre a categoria Preta e o conjunto formado pela região Norte e pelos domicílios com 6 ou mais moradores. Dessa forma, a análise conjunta confirma os padrões observados nas análises individuais e evidencia, em um único mapa, a associação entre as regiões Norte e Nordeste, maiores tamanhos domiciliares e as categorias Parda e Preta, em contraste com a associação entre a região Sul e a categoria Branca.
+
+Comparando as análises:
+
+Na análise simples entre região e faixa etária, verificou-se a associação das regiões Sul e Sudeste com faixas etárias mais elevadas, enquanto Nordeste e Centro-Oeste apresentaram maior proximidade com grupos etários mais jovens. Já na análise entre raça/cor e número de moradores, observou-se a associação da categoria Branca com domicílios de menor porte e das categorias Parda e Preta com tamanhos domiciliares relativamente maiores.
+
+Na análise conjunta, esses padrões tornam-se mais evidentes ao se observar que a região Sul permanece fortemente associada à categoria Branca, enquanto as regiões Norte e Nordeste se aproximam das categorias Parda e Preta e dos domicílios com 5 e 6 ou mais moradores. Dessa forma, a estrutura regional observada anteriormente passa a ser complementada pelas características raciais e domiciliares, revelando um gradiente que contrapõe o Sul, associado à população branca, às regiões Norte e Nordeste, associadas a maiores tamanhos domiciliares e maior participação relativa das categorias Parda e Preta.
+
+
+Gráficos das análises anteriores:
+
+
+```{r}
+#| echo: false
+#| fig-cap: "Mapa de correspondências: número de moradores x região"
+#| fig-pos: H
+
+tab645 <- data.frame(
+  Moradores = c("1", "2", "3", "4", "5", "6 ou mais", "Total"),
+  Norte = c(627, 1105, 1269, 1119, 605, 561, 5286),
+  Nordeste = c(2592, 4475, 5015, 3699, 1681, 1054, 18516),
+  Sudeste = c(4918, 8301, 8228, 6067, 2144, 1082, 30740),
+  Sul = c(1680, 3089, 2975, 1933, 686, 305, 10668),
+  Centro_Oeste = c(772, 1447, 1409, 1120, 463, 223, 5434),
+  Total = c(10589, 18417, 18896, 13938, 5579, 3225, 70644)
+)
+
+rownames(tab645) <- tab645$Moradores
+tab645$Moradores <- NULL
+
+tab645_ca <- tab645[-nrow(tab645), -ncol(tab645)]
+
+res_ca <- ca(tab645_ca)
+
+plot(res_ca)
+
+```
+
+```{r}
+#| echo: false
+#| fig-cap: "Mapa de correspondências: região x cor/raça"
+#| fig-pos: H
+#6.7
+
+tab646 <- data.frame(
+  Regiao = c("Norte", "Nordeste", "Sudeste", "Sul", "Centro-Oeste", "Total"),
+  Branca = c(3279, 14190, 45438, 22813, 5746, 91466),
+  Preta = c(1388, 6572, 8580, 1321, 1437, 19298),
+  Parda = c(13640, 36323, 34642, 6041, 9256, 99902),
+  Total = c(18307, 57085, 88660, 30175, 16439, 210666)
+)
+
+rownames(tab646) <- tab646$Regiao
+tab646$Regiao <- NULL
+
+tab646 <- tab646 %>% select(-Total)
+
+res_646 <- ca(tab646)
+
+plot(res_646)
+```
+

@@ -1,0 +1,317 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+    fig-cap-location: top
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{PROVA 2 QUESTÃO 82}}
+
+\vspace{2.5cm}
+
+{\large Carlos César Yoshitake}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Resolução Exercícios da P2 da disciplina Análise Multivariada.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\singlespacing
+
+# Questão 82 (6.9 Artes e Barroso)
+
+\textbf{Faça os mapas da análise de correspondência simples de região versus grau de instrução, interprete os resultados.}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Tabela de Contingência: grau de instrução versus região"
+#| label: tbl-tcgr
+
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(psych)
+library(ca)
+
+dados <- data.frame(
+  Grau_Instrucao = c(
+    "Fundamental incompleto",
+    "Médio incompleto",
+    "Superior incompleto",
+    "Superior completo",
+    "Total"
+  ),
+  Norte = c(125, 56, 91, 16, 288),
+  Nordeste = c(356, 108, 240, 55, 759),
+  Sudeste = c(155, 124, 259, 76, 614),
+  Sul = c(53, 60, 103, 28, 244),
+  COeste = c(69, 59, 79, 18, 225),
+  Total = c(758, 407, 772, 193, 2130)
+)
+
+
+dados |>
+  kable(
+    format = "latex",
+    booktabs = TRUE,
+    align = c("l", rep("c", 6))
+  ) |>
+  kable_styling(
+    latex_options = c("HOLD_position")
+  )
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Mapa de Correspondências - grau de instrução X região"
+#| fig-height: 5
+#| fig-width: 6
+#| label: fig-mcgr
+
+
+tab <- as.matrix(
+  dados[dados$Grau_Instrucao != "Total",
+        c("Norte", "Nordeste", "Sudeste", "Sul", "COeste")]
+)
+
+rownames(tab) <- dados$Grau_Instrucao[dados$Grau_Instrucao != "Total"]
+
+resultado_ca <- ca(tab)
+
+plot(resultado_ca)
+
+```
+
+
+Observa-se, por meio da @fig-mcgr, que a região Centro-Oeste apresenta maior proximidade com a categoria Médio incompleto, indicando uma associação entre essas modalidades. As regiões Sudeste e Sul situam-se mais próximas das categorias Superior incompleto e Superior completo, sugerindo uma maior concentração relativa de indivíduos com níveis mais elevados de escolaridade nessas regiões. Por outro lado, a região Nordeste encontra-se associada à categoria Fundamental incompleto, enquanto a região Norte apresenta uma posição intermediária, sem uma associação tão pronunciada com nenhuma categoria específica de escolaridade.
+
+Além disso, a primeira dimensão explica 89,9% da inércia total, indicando que a maior parte da estrutura de associação entre grau de instrução e região pode ser interpretada ao longo desse eixo. A segunda dimensão responde por 10,0% da inércia, contribuindo de forma complementar para a diferenciação dos perfis observados.
+
+\textbf{b) Quantos eixos seriam necessários para explicar 100% da inércia total?}
+
+Por meio da função \texttt{summary()}, quando aplicada no resultado da análise de correspondências \texttt{ca()}, do pacote \texttt{ca}, é possível observar quanto cada dimensão (eixo), contribui para a inércia total.
+
+```{r}
+summary(resultado_ca)
+```
+Logo, com base na saída da função podemos observar a seguinte porcentagem de explicação da inércia total por dimensão:
+
+- Dimensão 1: 89.9%
+- Dimensão 2: 10.0%
+- Dimensão 3: 0.1%
+
+Assim, para explicar 100% da inércia total seriam necessárias 3 dimensões, ou seja, 3 eixos.
+
+\textbf{c) Qual é a porcentagem da inércia principal explicada por cada um dos eixos?}
+
+Essa questão foi respondida na alternativa \textbf{b)}, mas seguem os valores:
+
+- Dimensão 1: 89.9%
+- Dimensão 2: 10.0%
+- Dimensão 3: 0.1%
+
+Observação: Vale pontuar que nessa análise existem apenas 3 dimensões possíveis, e a terceira dimensão, segundo o \texttt{summary()}, explica apenas 0.1% da inércia total, ou seja, ela possui um autovalor quase nulo($6.5 \times 10^{-5}$).
+
+\textbf{d) Qual é a qualidade da representação de cada categoria de região e de grau de instrução?}
+
+Através do \texttt{summary()}, novamente, podemos observar exatamente qual é a qualidade de cada categoria de região e de grau de instrução.
+
+Para as categorias de grau de instrução:
+
+- Fundamental Incompleto: $qlt$ = 1000;
+- Médio Incompleto: $qlt$ = 1000;
+- Superior Incompleto: $qlt$ = 996;
+- Superior Completo: $qlt$ = 996;
+
+Dessa forma, todas as categorias de grau de instrução encontram-se extremamente bem representadas no plano formado pelas duas primeiras dimensões, sendo que as categorias Fundamental incompleto e Médio incompleto possuem representação praticamente perfeita.
+
+Para as categorias de região:
+
+- Norte: $qlt$ = 993;
+- Nordeste: $qlt$ = 1000;
+- Sudeste: $qlt$ = 1000;
+- Sul: $qlt$ = 1000;
+- Centro-Oeste: $qlt $= 993.
+
+Assim, todas as regiões também apresentam excelente qualidade de representação no mapa perceptual. As regiões Nordeste, Sudeste e Sul possuem representação praticamente perfeita, enquanto Norte e Centro-Oeste apresentam valores ligeiramente inferiores, mas ainda muito próximos de 1000, indicando que quase toda a variabilidade dessas categorias é explicada pelas duas primeiras dimensões.
+
+\textbf{Qual é a região que mais explica a inércia dos eixos do mapa? de Quanto?}
+
+Através do \texttt{summary()}, novamente, podemos observar exatamente qual é a região que mais explica a inércia dos eixos do mapa.
+Na dimensão 1, o Nordeste é o que mais contribui para a inércia do eixo, com contribuição de 412, ou seja 41.2% da inércia da primeira dimensão.
+Na dimensão 2, o Centro-Oeste é o que mais contribui para a inércia do eixo, com contribuição de 472, ou seja 47.2% da inércia da segunda dimensão.
+
+\textbf{Qual é a contribuição dos eixos para cada categoria de grau de instrução?}
+
+Através do \texttt{summary()}, novamente, podemos observar exatamente qual é a contribuição dos eixos para cada categoria de grau de instrução. 
+
+O eixo 1 contribui da seguinte maneira para as categorias do grau de instrução:
+
+- Fundamental Incompleto: $k=1$ = 294;
+- Médio Incompleto: $k=1$ = -174;
+- Superior Incompleto: $k=1$ = -133;
+- Superior Completo: $k=1$ = -257;
+
+Já o eixo 2:
+
+- Fundamental Incompleto: $k=2$ = -3;
+- Médio Incompleto: $k=2$ = 134;
+- Superior Incompleto: $k=2$ = -36;
+- Superior Completo: $k=2$ = -129;

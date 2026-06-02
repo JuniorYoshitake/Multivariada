@@ -1,0 +1,339 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+    fig-cap-location: top
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{PROVA 2 QUESTÃO 66}}
+
+\vspace{2.5cm}
+
+{\large Carlos César Yoshitake}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Resolução Exercícios da P2 da disciplina Análise Multivariada.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\singlespacing
+
+# (66) Questão 4.3 Artes e Barroso
+
+\textbf{Retome o enunciado do Exercício 2.5. Aplique uma análise fatorial pelo método das componentes principais utilizando a matriz de correlações policóricas. O conjunto de fatores deve explicar pelo menos 70\% da variabilidade total dos dados. Faça uma análise completa dos resultados.}
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: Matriz de correlações policóricas - Q 4.3
+
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(psych)
+
+pizza <- read.csv("Pizza.csv") %>% select(-brand, -id)
+
+pizza_ord <- pizza %>%
+  mutate(across(
+    everything(),
+    \(x) {
+      cortes <- quantile(
+        x,
+        probs = seq(0, 1, length.out = 12),
+        na.rm = TRUE
+      )
+      cortes <- unique(cortes)
+      
+      cut(
+        x,
+        breaks = cortes,
+        include.lowest = TRUE,
+        labels = FALSE
+      ) - 1
+    }
+  ))
+
+matriz_poly <- polychoric(pizza_ord, max.cat = 11)$rho
+
+kable(
+  round(matriz_poly, 4),
+  format = "latex",
+  booktabs = TRUE) %>%
+  kable_styling(latex_options = c("hold_position"))
+
+```
+
+A matriz de correlações policóricas não apresenta elementos fora da diagonal muito próximos de zero. Portanto, a análise fatorial será útil.
+
+### Definição do Número de Fatores
+
+```{r}
+#| echo: false
+#| fig-cap: "Scree-Plot dos dados Pizza.csv"
+
+autovalores <- eigen(matriz_poly)$values
+
+plot(autovalores, type = "b", pch = 19, col = "blue",
+     main = "Scree Plot - Pizza",
+     xlab = "Número do Componente",
+     ylab = "Autovalor (Variância)")
+```
+
+O Scree-plot denota que 3 fatores são suficientes para a análise Fatorial, atráves da análise do "ponto do cotovelo".
+
+###  Extração de Fatores
+
+```{r}
+#| echo: false
+#| tbl-cap: "Cargas fatoriais (rotação varimax), comunalidades e variância específica dos dados Pizza"
+
+fit <- principal(matriz_poly, nfactors = 3, rotate = "varimax")
+
+# cargas fatoriais
+cargas <- as.data.frame(unclass(fit$loadings))
+
+# comunalidades
+cargas$h2 <- fit$communality
+
+# unicidades
+cargas$ei <- fit$uniquenesses
+
+# soma dos quadrados das cargas
+ss <- data.frame(
+  RC1 = sum(cargas$RC1^2),
+  RC2 = sum(cargas$RC2^2),
+  RC3 = sum(cargas$RC3^2),
+  h2 = NA,
+  ei = NA
+)
+
+cargas <- cargas %>% mutate(h2 = round(h2, 4),
+                            ei = round(ei, 4))
+
+# adiciona linha final
+tabela_final <- bind_rows(cargas, SS = ss)
+
+tabela_final$h2[is.na(tabela_final$h2)] <- ""
+tabela_final$ei[is.na(tabela_final$ei)] <- ""
+
+rownames(tabela_final)[8] <- "SS"
+
+# tabela latex
+kable(
+  tabela_final,
+  format = "latex",
+  booktabs = TRUE,
+  align = "c",
+  escape = FALSE,
+  digits = 2,
+  col.names = c("F1", "F2", "F3", "$h^2$", "$\\psi$")
+) %>%
+  kable_styling(
+    latex_options = c("hold_position", "striped")
+  )
+
+p <- nrow(cargas)
+
+var_f1 <- ss$RC1 / p
+var_f2 <- ss$RC2 / p
+var_f3 <- ss$RC3 / p
+
+var_total <- var_f1 + var_f2 + var_f3
+
+```
+
+
+### Interpretação dos fatores e Análise das comunalidades e Avaliação do ajuste do modelo
+
+O Fator 1 (F1), possui carga fatorial relevante positiva para prot, ash e fat e negativa para carb. Esse padrão indica contraste entre alimentos com maiores teores proteína, gordura e cinzas e aqueles com maior concentração de carboidratos. Logo, é possível apontar que os atributos com maiores cargas fatoriais são associados a características da composição do recheio das pizzas, denotando à F1, uma interpretação adequada "Perfil do Recheio".
+
+Por sua vez, o Fator 2 (F2) apresenta carga fatorial relevante positiva para cal e negativa para mois. Esse padrão indica uma relação inversa entre calorias e umidade, de modo queprodutos com maiores escores nesse fator tendem a apresentar maior conteúdo calórico e menor teor de umidade. Dessa forma, uma interpretação adequada para F2 é Calorias versus Umidade, uma vez que o fator sintetiza o contraste entre a densidade energética e o conteúdo de água dos produtos.
+
+Por fim, o Fator 3 (F3) contém carga fatorial relevante positiva  positiva para sodium e ash. Esse comportamento indica que F3 possui uma interpretação adequada "Teor de Cinzas e Sódios", uma vez que apresenta baixa carga fatorial nos outros atributos.
+
+Observa-se que nem sempre é possível identificar exatamente o que o Fator está medindo, apenas é possível atribuir interpretações.
+
+A porcentagem da variância explicada foi de 92.59%, satisfatória e maior que os 70% que o exercício pediu.
+
+Ademais, é possível observar que as comunalidades são altas (maiores que 0.5) e próximas de 1. Logo, preliminarmente o modelo possui um bom ajuste. Outra maneira de verificar é comparar a matriz de covariâncias amostrais observada com a estimativa sob modelo:
+
+\begin{equation}
+\hat{\Sigma} = \hat{\Phi}\hat{\Phi}^{\top} + \hat{\Psi}.
+\label{eq:modelo_fatorial}
+\end{equation}
+
+```{r}
+#| echo: false
+#| tbl-cap: "Matriz de resíduos entre as correlações observadas e reproduzidas pelo modelo fatorial - Pizza"
+
+Psi <- diag(fit$uniquenesses)
+
+Lambda <- as.matrix(unclass(fit$loadings))
+
+Sigma_hat <- Lambda %*% t(Lambda) + Psi
+
+Residual <- matriz_poly - Sigma_hat
+
+kable(
+  round(Residual, 4),
+  format = "latex",
+  booktabs = TRUE) %>%
+  kable_styling(latex_options = c("hold_position"))
+```
+
+Por meio da matriz de resíduos, observa-se que praticamente todos os resíduos apresentam magnitude reduzida e próxima de zero, sendo inferiores a 0,10 em valor absoluto, com exceção do par prot e mois, cujo resíduo é igual a −0.1058. Esse resultado indica que a matriz de correlações reproduzida pelo modelo é bastante semelhante à matriz observada. Portanto, a solução fatorial apresenta um bom ajuste, não havendo evidências de discrepâncias relevantes entre os dados observados e aqueles reproduzidos pelos fatores extraídos.

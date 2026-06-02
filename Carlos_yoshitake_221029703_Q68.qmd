@@ -1,0 +1,492 @@
+---
+title: ""
+author: ""
+date: ""
+
+title-block: false
+toc: false
+number-sections: true
+
+lang: pt-BR
+
+bibliography: referencias.bib
+csl: abnt.csl
+
+format:
+  pdf:
+    pdf-engine: lualatex
+    documentclass: article
+    papersize: a4
+    fontsize: 12pt
+    fig-cap-location: top
+
+    geometry:
+      - left=3cm
+      - top=3cm
+      - right=2cm
+      - bottom=2cm
+
+    colorlinks: true
+
+    include-in-header:
+      text: |
+
+        % ------------------------------------------------
+        % Matemática
+        % ------------------------------------------------
+        \usepackage{amsmath}
+        \usepackage{amsfonts}
+        \usepackage{amssymb}
+
+        % ------------------------------------------------
+        % Estilo e layout
+        % ------------------------------------------------
+        \usepackage{fancyhdr}
+        \usepackage{colortbl}
+        \usepackage{titletoc}
+        \usepackage{titlesec}
+        \usepackage{setspace}
+        \usepackage{indentfirst}
+        \usepackage{multirow}
+        \usepackage{float}
+        \usepackage{booktabs}
+        \usepackage{enumitem}
+        \usepackage{quoting}
+        \usepackage{epigraph}
+        \usepackage{adjustbox}
+        \usepackage{bm}
+        \usepackage{subcaption}
+        \usepackage{array}
+
+        % ------------------------------------------------
+        % Bibliografia ABNT
+        % ------------------------------------------------
+        \usepackage[alf]{abntex2cite}
+
+        % ------------------------------------------------
+        % Configurações gerais
+        % ------------------------------------------------
+        \raggedbottom
+
+        % ------------------------------------------------
+        % Cabeçalho
+        % ------------------------------------------------
+        \pagestyle{fancy}
+        \fancyhf{}
+
+        \setlength{\headheight}{16pt}
+
+        \fancyhead[RO, LE]{\thepage}
+        \fancyhead[RE, LO]{\nouppercase{\emph{\leftmark}}}
+
+        \renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+
+        % ------------------------------------------------
+        % Sumário
+        % ------------------------------------------------
+        \titlecontents{section}
+          [0cm]
+          {}
+          {\bfseries\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        \titlecontents{subsection}
+          [0.75cm]
+          {}
+          {\contentslabel{2em}}
+          {}
+          {\titlerule*[.75pc]{.}\contentspage}
+
+        % ------------------------------------------------
+        % Espaçamento
+        % ------------------------------------------------
+        \onehalfspacing
+
+        \setlength{\parindent}{1.25cm}
+        \setlength{\parskip}{0.15cm}
+        
+        \setlength{\textfloatsep}{6pt}
+        \setlength{\intextsep}{6pt}
+        \setlength{\floatsep}{6pt}
+        
+        \captionsetup[figure]{position=top, skip=2pt}
+        \captionsetup[subfigure]{skip=2pt}
+        
+        % ------------------------------------------------
+        % Títulos
+        % ------------------------------------------------
+        \titlespacing*{\section}{0cm}{0cm}{0.5cm}
+        \titlespacing*{\subsection}{0cm}{0.5cm}{0.5cm}
+        \titlespacing*{\subsubsection}{0cm}{0.5cm}{0.5cm}
+
+---
+
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1cm}
+
+\includegraphics[scale = 1.0]{imagens/unb.png}
+
+\vspace{1cm}
+
+{\bf \large Universidade de Brasília \\
+Departamento de Estatística}
+
+\vspace{3cm}
+
+{\Large \textbf{PROVA 2 QUESTÃO 68}}
+
+\vspace{2.5cm}
+
+{\large Carlos César Yoshitake}
+
+\vspace{0.25cm}
+
+{\large Prof. George Von Borries}
+
+\end{center}
+
+\vspace{1.5cm}
+
+\begin{flushright}
+\begin{minipage}{7.5cm}
+Resolução Exercícios da P2 da disciplina Análise Multivariada.
+\end{minipage}
+\end{flushright}
+
+\vspace{2.5cm}
+
+\begin{center}
+{\bf Brasília} \\
+{\bf 2026}
+\end{center}
+
+\end{titlepage}
+
+\tableofcontents
+
+\newpage
+
+\singlespacing
+
+# (68) Questão 4.8 Artes e Barroso
+
+\textbf{A Tabela 4.21 traz algumas frases que fazem parte de um questionário que
+foi respondido por atletas de basquete com o objetivo de avaliar o que lhes causa stress. Quanto maior o valor da variável, maior é a percepção do atleta de que a característica é estressante. Os dados estão armazenados na aba dados do arquivo Stress.xlsx, provenientes do projeto “Stress e Basquetebol de Alto Nível e Categorias Menores”, submetido ao CEA Centro de Estatística Aplicada do IME-USP.11}
+
+Dicionário das variáveis:
+
+- X1: Necessidade de sempre jogar bem  
+- X2: Perder  
+- X3: Autocobrança exagerada  
+- X4: Pensamentos negativos sobre sua carreira  
+- X5: Perder jogo praticamente ganho  
+- X6: Repetir os mesmos erros  
+- X7: Cometer erros que provocam a derrota da equipe  
+- X8: Adversário desleal  
+- X9: Arbitragem prejudica você  
+- X10: Falta de humildade de um companheiro de equipe  
+- X11: Pessoas com pensamento negativo  
+- X12: Companheiro desleal  
+- X13: Diferenças de tratamento na equipe  
+- X14: Falta de confiança por parte do técnico  
+
+\textbf{a) Faça uma análise fatorial considerando a matriz de correlações policóricas entre as variáveis X1 a X14}
+
+Para garantir a estabildiade das estimativas dos limiares da matriz policórica e evitar distorções por dados esparços realizou-se o agrupamento de categorias com frequências inferiores a 5 observações.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| tbl-cap: "Matriz de correlações policóricas  1 de 2- Q 4.8"
+
+library(readxl)
+library(knitr)
+library(kableExtra)
+library(dplyr)
+library(psych)
+
+dados <- read_xlsx(path = "Stress\\Stress.xlsx") %>% select(-Código)
+
+dados$X1 <- ifelse(dados$X1 == 6, 5, dados$X1)
+
+dados$X5[dados$X5 == 1] <- 0
+
+dados$X5 <- as.numeric(as.factor(dados$X5)) - 1
+
+dados$X6 <- ifelse(dados$X6 == 0, 1, dados$X1)
+
+dados$X7[dados$X7 == 0] <- 2
+
+dados$X7 <- as.numeric(as.factor(dados$X7)) - 1
+
+dados$X8 <- ifelse(dados$X8 == 7, 6, dados$X8)
+
+dados$X8 <- ifelse(dados$X8 == 6, 5, dados$X8)
+
+dados$X10 <- ifelse(dados$X10 == 6, 5, dados$X10)
+
+dados$X11 <- ifelse(dados$X11 == 6, 5, dados$X11)
+
+dados$X12 <- ifelse(dados$X12 == 6, 5, dados$X12)
+
+dados$X13[dados$X13 == 1] <- 0
+
+dados$X13 <- as.numeric(as.factor(dados$X13)) - 1
+
+matriz_poly <- polychoric(dados)$rho
+
+kable(
+  round(matriz_poly[, 1:7], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("HOLD_position")
+  )
+
+```
+
+
+```{r}
+#| echo: false
+#| tbl-cap: "Matriz de correlações policóricas  2 de 2- Q 4.8"
+kable(
+  round(matriz_poly[, 8:14], 4),
+  format = "latex",
+  booktabs = TRUE
+) %>%
+  kable_styling(
+    latex_options = c("HOLD_position")
+  )
+```
+
+A matriz de correlações policóricas não apresenta elementos fora da diagonal muito próximos de zero. Portanto, a análise fatorial será útil.
+
+```{r}
+#| echo: false
+#| tbl-cap: "Cargas fatoriais (rotação varimax) com m = 2, comunalidades e variância específica dos dados Stresse"
+
+fit <- principal(matriz_poly, nfactors = 2, rotate = "varimax")
+
+# cargas fatoriais
+cargas <- as.data.frame(unclass(fit$loadings))
+
+# comunalidades
+cargas$h2 <- fit$communality
+
+# unicidades
+cargas$ei <- fit$uniquenesses
+
+ss <- data.frame(
+  RC1 = sum(cargas$RC1^2),
+  RC2 = sum(cargas$RC2^2),
+  h2 = NA,
+  ei = NA
+)
+
+# arredondamento
+cargas <- cargas %>%
+  mutate(
+    h2 = round(h2, 4),
+    ei = round(ei, 4)
+  )
+
+# adiciona linha SS
+tabela_final <- bind_rows(cargas, SS = ss)
+
+# substitui NAs por vazio
+tabela_final$h2[is.na(tabela_final$h2)] <- ""
+tabela_final$ei[is.na(tabela_final$ei)] <- ""
+
+# nome da última linha
+rownames(tabela_final)[nrow(tabela_final)] <- "SS"
+
+# evita erro com "_"
+rownames(tabela_final) <- gsub(
+  "_",
+  "\\\\_",
+  rownames(tabela_final)
+)
+
+# variância explicada
+p <- nrow(cargas)
+
+var_f1 <- ss$RC1 / p
+var_f2 <- ss$RC2 / p
+
+var_total <- var_f1 + var_f2
+
+# tabela LaTeX
+kable(
+  tabela_final,
+  format = "latex",
+  booktabs = TRUE,
+  align = "c",
+  escape = FALSE,
+  digits = 2,
+  col.names = c("F1", "F2", "$h^2$", "$\\psi$")
+) %>%
+  kable_styling(
+    latex_options = c("HOLD_position", "striped")
+  )
+```
+
+Como é possível ver através da tabela da AF com $m=2$, a soma das cargas fatoriais ao quadrado foi de apenas $3.44$ e $3.31$, o que denota a porcentagem da variância explicada de apenas 48.18%. Logo, é necessário um número maior de fatores para capturar uma porcentagem de variância maior.
+
+```{r}
+#| echo: false
+#| tbl-cap: "Cargas fatoriais (rotação varimax) com m = 6, comunalidades e variância específica dos dados Stresse"
+#| label: tbl-m6
+
+fit <- principal(matriz_poly, nfactors = 6, rotate = "varimax")
+
+# cargas fatoriais
+cargas <- as.data.frame(unclass(fit$loadings))
+
+# comunalidades
+cargas$h2 <- fit$communality
+
+# unicidades
+cargas$ei <- fit$uniquenesses
+
+ss <- data.frame(
+  RC1 = sum(cargas$RC1^2),
+  RC2 = sum(cargas$RC2^2),
+  RC3 = sum(cargas$RC3^2),
+  RC4 = sum(cargas$RC4^2),
+  RC5 = sum(cargas$RC5^2),
+  RC6 = sum(cargas$RC6^2),
+  h2 = NA,
+  ei = NA
+)
+
+# arredondamento
+cargas <- cargas %>%
+  mutate(
+    h2 = round(h2, 4),
+    ei = round(ei, 4)
+  )
+
+# adiciona linha SS
+tabela_final <- bind_rows(cargas, SS = ss)
+
+# substitui NAs por vazio
+tabela_final$h2[is.na(tabela_final$h2)] <- ""
+tabela_final$ei[is.na(tabela_final$ei)] <- ""
+
+# nome da última linha
+rownames(tabela_final)[nrow(tabela_final)] <- "SS"
+
+# evita erro com "_"
+rownames(tabela_final) <- gsub(
+  "_",
+  "\\\\_",
+  rownames(tabela_final)
+)
+
+# variância explicada
+p <- nrow(cargas)
+
+var_f1 <- ss$RC1 / p
+var_f2 <- ss$RC2 / p
+var_f3 <- ss$RC3 / p
+var_f4 <- ss$RC4 / p
+var_f5 <- ss$RC5 / p
+var_f6 <- ss$RC6 / p
+
+var_total <- var_f1 + var_f2 + var_f3 + var_f4 + var_f5 + var_f6
+
+# tabela LaTeX
+kable(
+  tabela_final,
+  format = "latex",
+  booktabs = TRUE,
+  align = "c",
+  escape = FALSE,
+  digits = 2,
+  col.names = c("F1", "F2", "F3", "F4","F5", "F6", "$h^2$", "$\\psi$")
+) %>%
+  kable_styling(
+    latex_options = c("HOLD_position", "striped")
+  )
+```
+
+Com $m=6$, a porcentagem da variância explicada foi de 74.89%
+
+
+\textbf{b) Construa o gráfico dos autovalores. Quantos fatores você escolheria se quisesse explicar pelo menos 70% da variabilidade total dos dados?
+}
+
+```{r}
+#| echo: false
+#| fig-cap: "Scree-Plot dos dados Stress.xlsx"
+
+autovalores <- eigen(matriz_poly)$values
+
+plot(autovalores, type = "b", pch = 19, col = "blue",
+     main = "Scree Plot - BemEstarFin",
+     xlab = "Número do Componente",
+     ylab = "Autovalor (Variância)")
+```
+
+Apesar da "Regra de cotovelo" apontar que apenas 2 fatores seriam suficientes, como foi visto na alternativa anterior, são necessários 6 fatores para obter 70% da variância explicada.
+
+\textbf{c) Qual é o valor das comunalidades se fossem considerados o número de fatores fixado no item b)? Você acredita que esse número seria suficiente? Por quê?
+}
+
+Com base na tabela @tbl-m6, nota-se que, quando $m=6$, as comunalidades são todas maiores que 0.5, de maneira que a maior variância específica é de 0.3869. Eu acredito que 6 fatores não são suficientes, pois apenas 74% de variância explicada, assumindo uma postura conservadora, não são o bastante. Uma porcentagem ideal, do meu ponto de vista, é de 90% para mais.
+
+\textbf{d) Interprete os Fatores escolhidos}
+
+O Fator 1 (F1) possui cargas fatoriais altas, ordenadas do maior para o menor, em:
+
+- X8: Adversário desleal (0.73); 
+- X10: Falta de humildade de um companheiro de equipe (0.69);
+- X12: Companheiro desleal (0.64); 
+- X9: Arbitragem prejudica você (0.57);  
+- X11: Pessoas com pensamento negativo (0.54). 
+
+Logo, pode ser interpretado como "Percepção negativa acerca das pessoas ao redor".
+
+O Fator 2 (F2) contém cargas fatoriais altas, ordenadas do maior para o menor, em:
+
+- X6: Repetir os mesmos erros (0.88); 
+- X1: Necessidade de sempre jogar bem (0.87).
+
+Portanto, pode ser interpretado como "Pressão alheia" ou "Cobrança alheia".
+
+O Fator 3 (F3) apresenta cargas fatoriais altas, ordenadas do maior para o menor, em:
+
+- X2: Perder (0.88;)
+- X5: Perder jogo praticamente ganho (0.53).
+
+Então, pode ser interpretado como "Medo de perder"
+
+O Fator (F4) possui cargas fatoriais altas, ordenadas do maior para o menor, em:
+
+- X7: Cometer erros que provocam a derrota da equipe (0.85).
+
+e menores que 0.5
+
+- X9: Arbitragem prejudica você (0.48);
+- X5: Perder jogo praticamente ganho  (0.46).
+
+Logo, por ser interpretado como "Culpa pela derrota".
+
+O Fator (F5) contém cargas fatoriais altas, ordenadas do maior para o menor, em:
+
+- X14: Falta de confiança por parte do técnico (0.81);
+- X13: Diferenças de tratamento na equipe  (0.85).
+
+Portanto, pode ser interpretado como "Baixa confiança e tratamento negativo da equipe".
+
+Por fim, o Fator 6 (F6), contém cargas fatoriais altas, ordenadas do maior para o menor, em:
+
+- X4: Pensamentos negativos sobre sua carreira (0.78) 
+- X3: Autocobrança exagerada (0.74).
+
+Então, de maneira análoga ao Fator 2, o Fator 6 pode ser interpretado como "Autocobrança", uma pressão que os jogadores aplicam neles mesmos.
